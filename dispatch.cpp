@@ -10,6 +10,8 @@
 #include <string.h>
 #include <assert.h>
 
+#include <sstream>
+
 #include "dispatch.hpp"
 #include "bindings.hpp"
 
@@ -21,6 +23,22 @@ Dispatch::Dispatch() : path() {
 
 Dispatch::~Dispatch() {
 }
+
+//////////////////////////////////////////////////////////////////////
+// Manage state as we gather each keystroke leading to a function
+// dispatch.
+//
+// ARGUMENTS:
+//	keystroke	Most recently read keystroke
+//	proc		Returned dispatch procedure (if any)
+//	bmap		Current binding map to use
+//	
+// RETURNS:
+//	More		More input required (nothing to dispatch yet)
+//	Exec		Dispatch to returned proc
+//	Failed		Keystrokes were not bound to anything (error)
+//	
+//////////////////////////////////////////////////////////////////////
 
 Dispatch::Action
 Dispatch::dispatch(keych_t keystroke,bindproc_t& proc,const Key_Bindings& bmap) {
@@ -84,6 +102,29 @@ Dispatch::dispatch(keych_t keystroke,bindproc_t& proc,const Key_Bindings& bmap) 
 	}
 
 	return Failed;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Return any pending prefix and path for display to the user
+//////////////////////////////////////////////////////////////////////
+
+void
+Dispatch::get_pending(std::string& prefix,std::string& path) const {
+	
+	prefix.clear();
+	path.clear();
+
+	if ( have_prefix ) {
+		std::stringstream s;
+
+		if ( prefix_sign >= 0 )
+			s << '+';
+		else	s << '-';
+		s << this->prefix;
+		prefix = s.str();
+	}
+
+	path = to_text(this->path);
 }
 
 // End dispatch.cpp

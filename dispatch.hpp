@@ -32,7 +32,11 @@ private:
 public:	Dispatch();
 	~Dispatch();
 
+	inline bool had_prefix() { return have_prefix; }
+	inline int get_prefix() { return prefix; }
+
 	Action dispatch(keych_t keystroke,bindproc_t& proc,const Key_Bindings& bmap);
+	void get_pending(std::string& prefix,std::string& path) const;
 };
 
 #endif // DISPATCH_HPP
