@@ -130,7 +130,7 @@ Terminal::set_fg(Colour c) {
 	short pair;
 	attr_t a;
 
-	::attr_get(&a,&pair,0);
+	attr_get(&a,&pair,0);
 	pair = ((fgx << 3) & 070) | ( pair & 0007 );
 	set_pair(pair);
 	bgpair = pair;
@@ -143,7 +143,7 @@ Terminal::set_bg(Colour c) {
 	short pair;
 	attr_t a;
 
-	::attr_get(&a,&pair,0);
+	attr_get(&a,&pair,0);
 	pair = ( pair & 070 ) | ( int(c) & 7 );
 	set_pair(pair);
 	bgpair = pair;
@@ -156,8 +156,8 @@ Terminal::set_pair(short pair) {
 	attr_t sv_attr;
 	short sv_pair;
 	
-	::attr_get(&sv_attr,&sv_pair,0);
-	::attr_set(sv_attr,pair,0);
+	attr_get(&sv_attr,&sv_pair,0);
+	attr_set(sv_attr,pair,0);
 }
 
 void
