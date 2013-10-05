@@ -114,18 +114,20 @@ Key_Bindings::unbind(const keysequ_t& sequ) {
 //////////////////////////////////////////////////////////////////////
 
 bindproc_t
-Key_Bindings::lookup(const keysequ_t& sequ) {
-	bindmap_t *bmap = &rootmap;
+Key_Bindings::lookup(const keysequ_t& sequ,bool &end) const {
+	const bindmap_t *bmap = &rootmap;
 	
 	for ( size_t x=0; x<sequ.size(); ++x ) {
 		keych_t keystroke = sequ[x];
 		auto it = bmap->find(keystroke);
 		if ( it != bmap->end() ) {
-			s_keynode& node = it->second;
+			const s_keynode& node = it->second;
 			if ( x+1 < sequ.size() ) {
 				// Intermediate node:
-				if ( node.mapref < 0 )
+				if ( node.mapref < 0 ) {
+					end = true;		// No further path
 					return 0;		// Not found
+				}
 				bmap = &bindmaps[node.mapref];	// Enter next map
 			} else	{
 				// Leaf node:
@@ -135,6 +137,7 @@ Key_Bindings::lookup(const keysequ_t& sequ) {
 			break;	// Not found
 	}
 
+	end = false;
 	return 0;
 }
 

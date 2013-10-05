@@ -43,7 +43,7 @@ public:	Key_Bindings();
 
 	bool bind(const keysequ_t& sequ,bindproc_t proc);
 	bool unbind(const keysequ_t& sequ);
-	bindproc_t lookup(const keysequ_t& sequ);
+	bindproc_t lookup(const keysequ_t& sequ,bool& end) const;
 	void import(const Key_Bindings& b);
 };
 
