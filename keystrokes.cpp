@@ -13,6 +13,7 @@
 #include <ncurses.h>
 #include <unordered_map>
 
+#include "strutil.hpp"
 #include "keystrokes.hpp"
 
 static std::unordered_map<int,std::string>     fwd_keymap;
@@ -287,7 +288,7 @@ to_text(const char *symbol) {
 			assert(!symbol[2]);
 			ch = int(symbol[1]) & 0x1F;
 		} else	{
-			std::string uc_symbol = symbol;
+			std::string uc_symbol = to_upper_const(symbol);
 
 			auto it = rev_keymap.find(uc_symbol);
 			if ( it != rev_keymap.end() )
