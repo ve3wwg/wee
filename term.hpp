@@ -6,9 +6,9 @@
 #ifndef TERM_HPP
 #define TERM_HPP
 
-class Terminal {
-	typedef int	keych_t;
+typedef int	keych_t;
 
+class Terminal {
 	enum Colour {
 		Black = 0,
 		Red,
