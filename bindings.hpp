@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////
 // bindings.hpp -- Key Bindings
-// Date: Sat Oct  5 11:14:21 2013   (C) datablocks.net
+// Date: Sat Oct  5 11:14:21 2013   (C) Warren Gay VE3WWG
 ///////////////////////////////////////////////////////////////////////
 
 #ifndef BINDINGS_HPP
@@ -12,10 +12,9 @@
 #include <vector>
 
 #include "term.hpp"
+#include "keystrokes.hpp"
 
 typedef void (*bindproc_t)(int prefix,bool has_prefix);
-
-typedef std::vector<keych_t> keysequ_t;
 
 class Key_Bindings {
 	struct s_keynode {
@@ -37,12 +36,15 @@ class Key_Bindings {
 protected:
 	int allocmap();
 	void freemap(int mapx);
+	void import(bindmap_t& map,keysequ_t& path);
 
 public:	Key_Bindings();
 	~Key_Bindings();
 
 	bool bind(const keysequ_t& sequ,bindproc_t proc);
 	bool unbind(const keysequ_t& sequ);
+	bindproc_t lookup(const keysequ_t& sequ);
+	void import(const Key_Bindings& b);
 };
 
 #endif // BINDINGS_HPP

@@ -1,6 +1,6 @@
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 // bindings.cpp -- Key Bindings
-// Date: Sat Oct  5 11:23:41 2013   (C) datablocks.net
+// Date: Sat Oct  5 11:23:41 2013   (C) Warren Gay VE3WWG
 ///////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
@@ -68,7 +68,7 @@ Key_Bindings::bind(const keysequ_t& sequ,bindproc_t proc) {
 			bmap = &bindmaps[node.mapref];
 		} else	{
 			node.proc = proc;
-			r = node.mapref < 0;		// True if func is not overriden
+			r = node.mapref < 0;		// True if func is leaf node
 		}
 	}
 	return r;
@@ -107,6 +107,66 @@ Key_Bindings::unbind(const keysequ_t& sequ) {
 	}
 
 	return false;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Lookup a binding
+//////////////////////////////////////////////////////////////////////
+
+bindproc_t
+Key_Bindings::lookup(const keysequ_t& sequ) {
+	bindmap_t *bmap = &rootmap;
+	
+	for ( size_t x=0; x<sequ.size(); ++x ) {
+		keych_t keystroke = sequ[x];
+		auto it = bmap->find(keystroke);
+		if ( it != bmap->end() ) {
+			s_keynode& node = it->second;
+			if ( x+1 < sequ.size() ) {
+				// Intermediate node:
+				if ( node.mapref < 0 )
+					return 0;		// Not found
+				bmap = &bindmaps[node.mapref];	// Enter next map
+			} else	{
+				// Leaf node:
+				return node.proc;		// May be null
+			}
+		} else
+			break;	// Not found
+	}
+
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Protected : Recursive map bindings import
+//////////////////////////////////////////////////////////////////////
+
+void
+Key_Bindings::import(bindmap_t& curmap,keysequ_t& path) {
+
+	for ( auto it = curmap.begin(); it != curmap.end(); ++it ) {
+		keych_t keystroke = it->first;
+		s_keynode& node = it->second;
+	
+		path.push_back(keystroke);
+		if ( node.proc )
+			bind(path,node.proc);
+		if ( node.mapref >= 0 )
+			import(bindmaps[node.mapref],path);
+		path.pop_back();
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+// Import (copy) bindings
+//////////////////////////////////////////////////////////////////////
+
+void
+Key_Bindings::import(const Key_Bindings& b) {
+	keysequ_t path;
+	
+	import(rootmap,path);
 }
 
 // End bindings.cpp
