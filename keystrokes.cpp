@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////
 // keystrokes.cpp -- Keystrokes Support
-// Date: Sat Oct  5 09:56:26 2013   (C) datablocks.net
+// Date: Sat Oct  5 09:56:26 2013   (C) Warren Gay VE3WWG
 ///////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
@@ -12,6 +12,7 @@
 
 #include <ncurses.h>
 #include <unordered_map>
+#include <sstream>
 
 #include "strutil.hpp"
 #include "keystrokes.hpp"
@@ -271,35 +272,100 @@ to_text(keych_t ch) {
 }
 
 //////////////////////////////////////////////////////////////////////
-// Convert string representation into a keych_t 
+// Convert string representation into a keych_t :
+// 
+// ARGUMENTS:
+//	symbol		Input text to parse
+//	widthp		Ptr to returned text width,
+//			or 0 if not required;
+//	For Example:
+//		"A^(LEFT)B" returns:
+//			'A' and *widthp = 1 for "A"
+//		"^(LEFT)B" returns:
+//			KEY_LEFT and *widthp = 7 for "^(LEFT)"
+// RETURNS:
+//	keych_t		Curses keystroke
 //////////////////////////////////////////////////////////////////////
 
 keych_t 
-to_text(const char *symbol) {
+to_keych(const char *symbol,int *widthp) {
 	keych_t ch = '?';
+	int width = 1;
 
 	if ( !initialized )
 		initialize();
 
 	if ( *symbol == '^' ) {
-		if ( !strcmp(symbol,"^(^)") )
+		if ( !strncmp(symbol,"^(^)",width=4) ) {
 			ch = 0x1E;
-		else if ( symbol[1] != '(' ) {
-			assert(!symbol[2]);
+		} else if ( symbol[1] != '(' ) {
 			ch = int(symbol[1]) & 0x1F;
-		} else	{
-			std::string uc_symbol = to_upper_const(symbol);
+			width = 2;
+		} else if ( symbol[1] == '(' ) {
+			// ^(LEFT)
+			// 0123456
+			const char *rbrkt = strchr(symbol,')');
+			if ( rbrkt != 0 ) {
+				width = (rbrkt - symbol) + 1;
+				char tsym[width+1];
+				
+				strncpy(tsym,symbol,width)[width] = 0;
+				std::string uc_symbol = to_upper_const(tsym);
 
-			auto it = rev_keymap.find(uc_symbol);
-			if ( it != rev_keymap.end() )
-				ch = it->second;
+				auto it = rev_keymap.find(uc_symbol);
+				if ( it != rev_keymap.end() )
+					ch = it->second;
+				else	ch = '?';
+			} else	{
+				ch = '?';
+				width = 2;
+			}
 		}
 	} else if ( *symbol >= ' ' && *symbol <= '~' ) {
-		assert(symbol[1] == 0);
 		ch = keych_t(*symbol);
+		width = 1;
+	} else	{
+		ch = '?';
+		width = 1;
 	}
 
+	if ( widthp != 0 )
+		*widthp = width;
+
 	return ch;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Convert a keystroke sequence to text
+//////////////////////////////////////////////////////////////////////
+
+std::string
+to_text(const keysequ_t& path) {
+	std::stringstream s;
+
+	for ( size_t x=0; x<path.size(); ++x ) {
+		std::string ks = to_text(path[x]);
+		s << ks;
+	}
+
+	return s.str();
+}
+
+//////////////////////////////////////////////////////////////////////
+// Convert a text keystroke sequence to a keysequ_t
+//////////////////////////////////////////////////////////////////////
+
+void
+to_keysequ(keysequ_t& path,const char *text) {
+	const char *cp;
+	int width;
+
+	path.clear();
+
+	for ( cp=text; *cp; cp += width ) {
+		keych_t keystroke = to_keych(cp,&width);
+		path.push_back(keystroke);
+	}
 }
 
 // End keystrokes.cpp

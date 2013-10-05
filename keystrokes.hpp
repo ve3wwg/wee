@@ -1,16 +1,23 @@
 //////////////////////////////////////////////////////////////////////
 // keystrokes.hpp -- Keystrokes Support
-// Date: Sat Oct  5 09:55:19 2013   (C) datablocks.net
+// Date: Sat Oct  5 09:55:19 2013   (C) Warren Gay VE3WWG
 ///////////////////////////////////////////////////////////////////////
 
 #ifndef KEYSTROKES_HPP
 #define KEYSTROKES_HPP
 
 #include <string>
+#include <vector>
 
 #include "term.hpp"
 
+typedef std::vector<keych_t> keysequ_t;
+
 std::string to_text(keych_t ch);
+keych_t to_keych(const char *symbol,int *widthp);
+
+std::string to_text(const keysequ_t& path);
+void to_keysequ(keysequ_t& path,const char *text);
 
 #endif // KEYSTROKES_HPP
 
