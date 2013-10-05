@@ -38,7 +38,7 @@ Terminal::clear() {
 	::clear();
 }
 
-Terminal::keych_t
+keych_t
 Terminal::get() {
 	return ::getch();
 }
