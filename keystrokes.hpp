@@ -16,6 +16,7 @@ typedef std::vector<keych_t> keysequ_t;
 #define KEY_ERROR	((keych_t)(~0))
 
 #define CONTROL(ch)	((ch)&0x1F)
+#define KEY_ESC		CONTROL('[')
 
 std::string to_text(keych_t ch);
 keych_t to_keych(const char *symbol,int *widthp);
