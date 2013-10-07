@@ -12,10 +12,17 @@
 #include <assert.h>
 
 #include "term.hpp"
+#include "dispatch.hpp"
+#include "bindings.hpp"
 
 Terminal term;
+Key_Bindings main_bindings;
 
 static struct termios saved_tty;
+
+//////////////////////////////////////////////////////////////////////
+// Cleanup routine 
+//////////////////////////////////////////////////////////////////////
 
 static void
 tty_cleanup() {
@@ -23,17 +30,54 @@ tty_cleanup() {
 	tcsetattr(0,TCSAFLUSH,&saved_tty);
 }
 
+//////////////////////////////////////////////////////////////////////
+// Exit the editor
+//////////////////////////////////////////////////////////////////////
+
+static void
+xeq_quit(int prefix,bool have_prefix) {
+	(void) prefix;
+	(void) have_prefix;
+	exit(0);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Initialize the main_bindings
+//////////////////////////////////////////////////////////////////////
+
+static void
+init_bindings() {
+	main_bindings.bind("^X^C",xeq_quit);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Main Routine
+//////////////////////////////////////////////////////////////////////
+
 int
 main(int argc,char **argv) {
+	Dispatch disp;
+	keych_t keystroke;
+	bindproc_t proc;
 	int rc;
 	
 	rc = tcgetattr(0,&saved_tty);		// Save current tty settings
 	assert(!rc);
 	atexit(tty_cleanup);			// Restore tty settings upon exit
 
+	init_bindings();
+
 	term.init();
 	term.clear();
-	term.get();
+
+	for (;;) {
+		keystroke = term.get();
+		if ( disp.dispatch(keystroke,proc,main_bindings) == Dispatch::Exec && proc != 0 ) {
+			int prefix = disp.get_prefix();
+			bool have_prefix = disp.had_prefix();
+			proc(prefix,have_prefix);
+		}
+	}
 
 	return 0;
 }
