@@ -315,9 +315,9 @@ to_keych(const char *symbol,int *widthp) {
 				auto it = rev_keymap.find(uc_symbol);
 				if ( it != rev_keymap.end() )
 					ch = it->second;
-				else	ch = '?';
+				else	ch = KEY_ERROR;
 			} else	{
-				ch = '?';
+				ch = KEY_ERROR;
 				width = 2;
 			}
 		}
@@ -325,7 +325,7 @@ to_keych(const char *symbol,int *widthp) {
 		ch = keych_t(*symbol);
 		width = 1;
 	} else	{
-		ch = '?';
+		ch = KEY_ERROR;
 		width = 1;
 	}
 
@@ -355,7 +355,7 @@ to_text(const keysequ_t& path) {
 // Convert a text keystroke sequence to a keysequ_t
 //////////////////////////////////////////////////////////////////////
 
-void
+bool
 to_keysequ(keysequ_t& path,const char *text) {
 	const char *cp;
 	int width;
@@ -364,8 +364,11 @@ to_keysequ(keysequ_t& path,const char *text) {
 
 	for ( cp=text; *cp; cp += width ) {
 		keych_t keystroke = to_keych(cp,&width);
+		if ( keystroke == KEY_ERROR )
+			return false;
 		path.push_back(keystroke);
 	}
+	return true;
 }
 
 // End keystrokes.cpp

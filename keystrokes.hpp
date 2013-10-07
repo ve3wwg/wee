@@ -13,11 +13,13 @@
 
 typedef std::vector<keych_t> keysequ_t;
 
+#define KEY_ERROR	((keych_t)(~0))
+
 std::string to_text(keych_t ch);
 keych_t to_keych(const char *symbol,int *widthp);
 
 std::string to_text(const keysequ_t& path);
-void to_keysequ(keysequ_t& path,const char *text);
+bool to_keysequ(keysequ_t& path,const char *text);
 
 #endif // KEYSTROKES_HPP
 
