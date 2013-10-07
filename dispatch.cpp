@@ -47,6 +47,11 @@ Dispatch::dispatch(keych_t keystroke,bindproc_t& proc,const Key_Bindings& bmap) 
 	proc = 0;
 
 	for (;;) {
+		if ( keystroke == CONTROL('G') ) {
+			state = Initial;
+			return Failed;
+		}
+
 		switch ( state ) {
 		case Initial :
 			path.clear();
