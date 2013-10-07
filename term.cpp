@@ -190,13 +190,13 @@ Terminal::bottomf(const char *format,...) {
 	va_list ap;
 
 	va_start(ap,format);
-	snprintf(temp,sizeof temp,format,ap);
+	::vsnprintf(temp,sizeof temp,format,ap);
 	va_end(ap);
 
 	temp[sizeof temp-1] = 0;
 
 	mvclear_botline();
-	addstr(temp);
+	::addstr(temp);
 }
 
 // End term.cpp
