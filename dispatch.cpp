@@ -16,7 +16,8 @@
 #include "bindings.hpp"
 
 Dispatch::Dispatch() : path() {
-	state = Prefix;
+	state = Initial;
+	prefix_sign = 0;
 	prefix = 1;
 	have_prefix = false;
 }
@@ -56,38 +57,40 @@ Dispatch::dispatch(keych_t keystroke,bindproc_t& proc,const Key_Bindings& bmap) 
 		case Initial :
 			path.clear();
 
-			prefix_sign = 1;
+			prefix_sign = '+';
 			prefix = 1;
 			have_prefix = false;
 
-			if ( keystroke == '-' || keystroke == '+' ) {
-				prefix_sign = keystroke == '-' ? (-1) : (+1);
-				have_prefix = true;
-				state = Prefix;
-				return More;
-			}
-
-			if ( keystroke >= '0' && keystroke <= '9' ) {
-				prefix_sign = +1;
-				prefix = keystroke & 0x0F;
-				have_prefix = true;
+			if ( keystroke == KEY_ESC ) {
+				prefix_sign = 0;
+				prefix = 0;
 				state = Prefix;
 				return More;
 			}
 
 			have_prefix = false;
-			prefix_sign = +1;
-			prefix = 1;
 			state = Path;
 			break;
 
 		case Prefix :
-			if ( keystroke >= '0' && keystroke <= '9' ) {
-				if ( !prefix && keystroke == '0' )
-					return More;
-				prefix = prefix * 10 + (keystroke & 0x0F);
+			if ( !prefix_sign && (keystroke == '-' || keystroke == '+') ) {
+				prefix_sign = keystroke;
+				have_prefix = true;
+				state = Prefix;
 				return More;
 			}
+
+			if ( !prefix_sign )
+				prefix_sign = '+';
+
+			if ( keystroke >= '0' && keystroke <= '9' ) {
+				prefix = prefix * 10 + (keystroke & 0x0F);
+				return More;
+			} else	{
+				state = Initial;
+				return Failed;
+			}
+
 			state = Path;
 			break;
 
@@ -122,11 +125,13 @@ Dispatch::get_pending(std::string& prefix,std::string& path) const {
 	if ( have_prefix ) {
 		std::stringstream s;
 
-		if ( prefix_sign >= 0 )
-			s << '+';
-		else	s << '-';
-		s << this->prefix;
-		prefix = s.str();
+		if ( prefix_sign != 0 ) {
+			if ( prefix_sign >= 0 )
+				s << '+';
+			else	s << '-';
+			s << this->prefix;
+			prefix = s.str();
+		}
 	}
 
 	path = to_text(this->path);
