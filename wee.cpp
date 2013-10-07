@@ -57,6 +57,7 @@ init_bindings() {
 int
 main(int argc,char **argv) {
 	Dispatch disp;
+	Dispatch::Action action;
 	keych_t keystroke;
 	bindproc_t proc;
 	int rc;
@@ -72,10 +73,12 @@ main(int argc,char **argv) {
 
 	for (;;) {
 		keystroke = term.get();
-		if ( disp.dispatch(keystroke,proc,main_bindings) == Dispatch::Exec && proc != 0 ) {
+		if ( (action = disp.dispatch(keystroke,proc,main_bindings)) == Dispatch::Exec && proc != 0 ) {
 			int prefix = disp.get_prefix();
 			bool have_prefix = disp.had_prefix();
 			proc(prefix,have_prefix);
+		} else if ( action == Dispatch::Failed ) {
+			term.flash();
 		}
 	}
 
