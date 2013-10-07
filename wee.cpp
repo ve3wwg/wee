@@ -74,11 +74,24 @@ main(int argc,char **argv) {
 	for (;;) {
 		keystroke = term.get();
 		if ( (action = disp.dispatch(keystroke,proc,main_bindings)) == Dispatch::Exec && proc != 0 ) {
+			term.mvclear_botline();
 			int prefix = disp.get_prefix();
 			bool have_prefix = disp.had_prefix();
 			proc(prefix,have_prefix);
 		} else if ( action == Dispatch::Failed ) {
+			term.bottomf("[Key not bound]");
 			term.flash();
+		} else	{
+			assert(action == Dispatch::More);
+			std::string prefix, path;
+
+			term.mvclear_botline();
+			disp.get_pending(prefix,path);
+			if ( prefix.size() != 0 ) {
+				term.bottomf("Arg: %s %s ",prefix.c_str(),path.c_str());
+			} else	{
+				term.bottomf("Key: %s ",path.c_str());
+			}
 		}
 	}
 

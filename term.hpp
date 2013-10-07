@@ -44,6 +44,9 @@ public:	Terminal();
 	void init();
 	void fini();
 
+	inline int get_lines()	{ return scr_lines; }
+	inline int get_cols()	{ return scr_cols; }
+
 	void clear();
 
 	Terminal& set_fg(Colour c);
@@ -52,6 +55,10 @@ public:	Terminal();
 	keych_t get();
 
 	void flash();
+
+	void mvbottom();
+	void mvclear_botline();
+	void bottomf(const char *format,...);
 };
 
 

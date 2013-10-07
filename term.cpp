@@ -171,4 +171,32 @@ Terminal::flash() {
 	::flash();
 }
 
+void
+Terminal::mvbottom() {
+	int y = scr_lines - 1;
+	int x = 0;
+	::move(y,x);
+}
+
+void
+Terminal::mvclear_botline() {
+	mvbottom();
+	::clrtoeol();
+}
+
+void
+Terminal::bottomf(const char *format,...) {
+	char temp[4096];
+	va_list ap;
+
+	va_start(ap,format);
+	snprintf(temp,sizeof temp,format,ap);
+	va_end(ap);
+
+	temp[sizeof temp-1] = 0;
+
+	mvclear_botline();
+	addstr(temp);
+}
+
 // End term.cpp
