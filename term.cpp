@@ -166,4 +166,9 @@ Terminal::fini() {
 	::endwin();
 }
 
+void
+Terminal::flash() {
+	::flash();
+}
+
 // End term.cpp
