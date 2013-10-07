@@ -41,6 +41,7 @@ protected:
 public:	Key_Bindings();
 	~Key_Bindings();
 
+	bool bind(const char *binding,bindproc_t proc);
 	bool bind(const keysequ_t& sequ,bindproc_t proc);
 	bool unbind(const keysequ_t& sequ);
 	bindproc_t lookup(const keysequ_t& sequ,bool& end) const;

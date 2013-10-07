@@ -11,6 +11,7 @@
 #include <assert.h>
 
 #include "bindings.hpp"
+#include "keystrokes.hpp"
 
 Key_Bindings::Key_Bindings() {
 }
@@ -170,6 +171,20 @@ Key_Bindings::import(const Key_Bindings& b) {
 	keysequ_t path;
 	
 	import(rootmap,path);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Bind using a string
+//////////////////////////////////////////////////////////////////////
+
+bool
+Key_Bindings::bind(const char *binding,bindproc_t proc) {
+	keysequ_t path;
+
+	if ( !to_keysequ(path,binding) )
+		return false;
+	bind(path,proc);
+	return true;
 }
 
 // End bindings.cpp
