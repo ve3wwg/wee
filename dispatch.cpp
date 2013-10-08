@@ -87,9 +87,6 @@ Dispatch::dispatch(keych_t keystroke,bindproc_t& proc,const Key_Bindings& bmap) 
 			if ( keystroke >= '0' && keystroke <= '9' ) {
 				prefix = prefix * 10 + (keystroke & 0x0F);
 				return More;
-			} else	{
-				state = Initial;
-				return Failed;
 			}
 
 			state = Path;
