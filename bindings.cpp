@@ -62,6 +62,8 @@ Key_Bindings::bind(const keysequ_t& sequ,bindproc_t proc) {
 	
 	for ( size_t x=0; x<sequ.size(); ++x ) {
 		keych_t keystroke = sequ[x];
+		if ( x > 0 && islower(keystroke) )
+			keystroke = toupper(keystroke);
 		s_keynode& node = (*bmap)[keystroke];
 		if ( x+1 < sequ.size() ) {
 			if ( node.mapref < 0 )
@@ -123,22 +125,21 @@ Key_Bindings::lookup(const keysequ_t& sequ,bool &end) const {
 		auto it = bmap->find(keystroke);
 		if ( it != bmap->end() ) {
 			const s_keynode& node = it->second;
-			if ( x+1 < sequ.size() ) {
+			end = node.mapref < 0;
+			if ( x+1 < sequ.size() || node.mapref >= 0 ) {
 				// Intermediate node:
-				if ( node.mapref < 0 ) {
-					end = true;		// No further path
+				if ( node.mapref < 0 )
 					return 0;		// Not found
-				}
 				bmap = &bindmaps[node.mapref];	// Enter next map
 			} else	{
 				// Leaf node:
 				return node.proc;		// May be null
 			}
-		} else
+		} else	{
+			end = true;
 			break;	// Not found
+		}
 	}
-
-	end = false;
 	return 0;
 }
 
