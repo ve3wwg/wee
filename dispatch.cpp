@@ -96,6 +96,8 @@ Dispatch::dispatch(keych_t keystroke,bindproc_t& proc,const Key_Bindings& bmap) 
 			break;
 
 		case Path :
+			if ( path.size() > 0 && islower(keystroke) )
+				keystroke = toupper(keystroke);
 			path.push_back(keystroke);
 			proc = bmap.lookup(path,end);
 			if ( proc ) {
