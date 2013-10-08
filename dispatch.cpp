@@ -85,7 +85,10 @@ Dispatch::dispatch(keych_t keystroke,bindproc_t& proc,const Key_Bindings& bmap) 
 				prefix_sign = '+';
 
 			if ( keystroke >= '0' && keystroke <= '9' ) {
-				prefix = prefix * 10 + (keystroke & 0x0F);
+				prefix *= 10;
+				if ( prefix_sign != '-' )
+					prefix += keystroke & 0x0F;
+				else	prefix -= keystroke & 0x0F;
 				return More;
 			}
 
@@ -127,12 +130,8 @@ Dispatch::get_pending(std::string& prefix,std::string& path) const {
 
 		s << "Arg: ";
 
-		if ( prefix_sign != 0 ) {
-			if ( prefix_sign >= 0 )
-				s << '+';
-			else	s << '-';
+		if ( prefix_sign != 0 )
 			s << this->prefix;
-		}
 		prefix = s.str();
 	}
 
