@@ -65,6 +65,7 @@ Dispatch::dispatch(keych_t keystroke,bindproc_t& proc,const Key_Bindings& bmap) 
 				prefix_sign = 0;
 				prefix = 0;
 				state = Prefix;
+				have_prefix = true;
 				return More;
 			}
 
@@ -125,13 +126,15 @@ Dispatch::get_pending(std::string& prefix,std::string& path) const {
 	if ( have_prefix ) {
 		std::stringstream s;
 
+		s << "Arg: ";
+
 		if ( prefix_sign != 0 ) {
 			if ( prefix_sign >= 0 )
 				s << '+';
 			else	s << '-';
 			s << this->prefix;
-			prefix = s.str();
 		}
+		prefix = s.str();
 	}
 
 	path = to_text(this->path);
