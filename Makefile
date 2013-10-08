@@ -4,7 +4,7 @@
 CXX             = g++
 INCL            = 
 DEFNS		= -DUSE_NCURSES
-CXXFLAGS        = -std=c++0x -Wall $(INCL) $(DEFNS)
+CXXFLAGS        = -std=c++0x -Wall $(INCL) $(DEFNS) $(OPTZ)
 OPTZ            = -g -O0
 #LDFLAGS         = -Wl,--no-warn-search-mismatch -lncurses
 LDFLAGS         = -lncurses
