@@ -88,7 +88,7 @@ main(int argc,char **argv) {
 			term.mvclear_botline();
 			disp.get_pending(prefix,path);
 			if ( prefix.size() != 0 ) {
-				term.bottomf("Arg: %s %s ",prefix.c_str(),path.c_str());
+				term.bottomf("%s ",prefix.c_str(),path.c_str());
 			} else	{
 				term.bottomf("Key: %s ",path.c_str());
 			}
