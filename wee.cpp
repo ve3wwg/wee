@@ -48,6 +48,7 @@ xeq_quit(int prefix,bool have_prefix) {
 static void
 init_bindings() {
 	main_bindings.bind("^X^C",xeq_quit);
+	main_bindings.bind("^XC",xeq_quit);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -56,20 +57,26 @@ init_bindings() {
 
 int
 main(int argc,char **argv) {
+	struct termios ios;
 	Dispatch disp;
 	Dispatch::Action action;
 	keych_t keystroke;
 	bindproc_t proc;
 	int rc;
 	
+	init_bindings();
+
 	rc = tcgetattr(0,&saved_tty);		// Save current tty settings
+
 	assert(!rc);
 	atexit(tty_cleanup);			// Restore tty settings upon exit
 
-	init_bindings();
-
 	term.init();
 	term.clear();
+
+	rc = tcgetattr(0,&ios);			// Get current tty settings
+	ios.c_lflag &= ~ISIG;			// No signal generation
+	rc = tcsetattr(0,TCSAFLUSH,&ios);
 
 	for (;;) {
 		keystroke = term.get();
