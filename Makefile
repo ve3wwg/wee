@@ -9,7 +9,7 @@ OPTZ            = -g -O0
 #LDFLAGS         = -Wl,--no-warn-search-mismatch -lncurses
 LDFLAGS         = -lncurses
 
-OBJS		= wee.o term.o keystrokes.o strutil.o bindings.o dispatch.o
+OBJS		= wee.o term.o keystrokes.o strutil.o bindings.o dispatch.o registry.o
 
 .cpp.o:
 	$(CXX) -c $(CXXFLAGS) $< -o $*.o
@@ -23,7 +23,7 @@ clean:
 	rm -f *.o errs.t
 
 clobber: clean
-	rm -f wee core*
+	rm -f wee core* a.out
 	
 backup:	clobber
 	(cd .. && tar czf wee.tar.gz wee)
