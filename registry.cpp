@@ -22,14 +22,14 @@ Registry::Registry() {
 // Create a new symbol
 //////////////////////////////////////////////////////////////////////
 
-Registry::id_t
+regid_t
 Registry::create(const std::string& name) {
 	auto it = fwdmap.find(name);
 	if ( it != fwdmap.end() )
 		return it->second;	// Return existing ID
 
-	id_t id = next_id++;		// Allocate an ID value
-	fwdmap[name] = id;		// Create a new entry
+	regid_t id = next_id++;		// Allocate an ID value
+	fwdmap[std::string(name)] = id;	// Create a new entry
 	revmap[id] = name;		// Create a reverse map entry
 	return id;
 }
@@ -38,7 +38,7 @@ Registry::create(const std::string& name) {
 // Lookup a symbol
 //////////////////////////////////////////////////////////////////////
 
-Registry::id_t
+regid_t
 Registry::lookup(const std::string& name) const {
 	auto it = fwdmap.find(name);
 	if ( it == fwdmap.end() )
@@ -51,7 +51,7 @@ Registry::lookup(const std::string& name) const {
 //////////////////////////////////////////////////////////////////////
 
 const std::string&
-Registry::reverse(id_t id) const {
+Registry::reverse(regid_t id) const {
 	auto it = revmap.find(id);
 	assert(it != revmap.end());
 	return it->second;
@@ -65,7 +65,7 @@ void
 Registry::erase(const std::string& name) {
 	auto it = fwdmap.find(name);
 	assert(it != fwdmap.end());
-	id_t id = it->second;
+	regid_t id = it->second;
 	fwdmap.erase(name);
 	revmap.erase(id);
 }
@@ -75,7 +75,7 @@ Registry::erase(const std::string& name) {
 //////////////////////////////////////////////////////////////////////
 
 void
-Registry::erase(id_t id) {
+Registry::erase(regid_t id) {
 	auto it = revmap.find(id);
 	assert(it != revmap.end());
 	std::string& name = it->second;
@@ -105,9 +105,9 @@ Registry::end() {
 // Lookup symbol with []  (aborts if non-existant)
 //////////////////////////////////////////////////////////////////////
 
-Registry::id_t
+regid_t
 Registry::operator[](const std::string& name) const {
-	id_t id = lookup(name);
+	regid_t id = lookup(name);
 	assert(id != 0);
 	return id;
 }
@@ -117,7 +117,7 @@ Registry::operator[](const std::string& name) const {
 //////////////////////////////////////////////////////////////////////
 
 const std::string&
-Registry::operator[](id_t id) const {
+Registry::operator[](regid_t id) const {
 	return reverse(id);
 }
 
