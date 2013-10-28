@@ -3,6 +3,7 @@
 // Date: Sat Sep  7 16:04:51 2013  (C) Warren Gay VE3WWG
 ///////////////////////////////////////////////////////////////////////
 
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -11,10 +12,13 @@
 #include <termios.h>
 #include <assert.h>
 
+#include "registry.hpp"
 #include "term.hpp"
 #include "dispatch.hpp"
 #include "bindings.hpp"
+#include "buffer.hpp"
 
+Registry buffer_registry;
 Terminal term;
 Key_Bindings main_bindings;
 
