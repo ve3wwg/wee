@@ -9,7 +9,7 @@ OPTZ            = -g -O0
 #LDFLAGS         = -Wl,--no-warn-search-mismatch -lncurses
 LDFLAGS         = -lncurses
 
-OBJS		= wee.o term.o keystrokes.o strutil.o bindings.o dispatch.o registry.o
+OBJS		= wee.o term.o keystrokes.o strutil.o bindings.o dispatch.o registry.o buffer.o
 
 .cpp.o:
 	$(CXX) -c $(CXXFLAGS) $< -o $*.o
