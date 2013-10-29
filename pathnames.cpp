@@ -17,15 +17,15 @@
 #include "pathnames.hpp"
 
 Pathname::Pathname() {
-	init(0);
+	import(0);
 }
 
 Pathname::Pathname(const char *path) {
-	init(path);
+	import(path);
 }
 
 void
-Pathname::init(const char *path) {
+Pathname::import(const char *path) {
 	std::string p = path;
 	std::vector<std::string> pvec;
 
@@ -103,6 +103,37 @@ Pathname::pathname() const {
 const char *
 Pathname::cpathname() const {
 	return pathcstr;
+}
+
+std::string
+Pathname::basename() const {
+
+	if ( path_list.size() <= 0 )
+		return "";
+	return *path_list.rbegin();
+}
+
+std::string
+Pathname::dirname() const {
+
+	if ( path_list.size() <= 1 )
+		return "";
+
+	std::stringstream s;
+
+	if ( full )
+		s << "/";
+
+	size_t n = path_list.size();
+	size_t x = 0;
+
+	for ( auto it=path_list.begin(); x+1 < n; ++it ) {
+		if ( x++ != 0 )
+			s << "/";
+		s << *it;
+	}
+
+	return s.str();
 }
 
 // End pathnames.cpp

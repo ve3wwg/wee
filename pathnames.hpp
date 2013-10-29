@@ -15,13 +15,15 @@ class Pathname {
 	std::string		pathstr;	// String form of pathname
 	const char 		*pathcstr;
 
-protected:
-	void init(const char *path);
-
 public:	Pathname();
 	Pathname(const char *path);
+	void import(const char *path);
+
 	const std::string& pathname() const;
 	const char * cpathname() const;
+
+	std::string basename() const;
+	std::string dirname() const;
 };
 
 
