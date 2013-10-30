@@ -110,7 +110,7 @@ Pathname::basename() const {
 
 	if ( path_list.size() <= 0 )
 		return "";
-	return *path_list.rbegin();
+	return path_list.back();
 }
 
 std::string
@@ -134,6 +134,26 @@ Pathname::dirname() const {
 	}
 
 	return s.str();
+}
+
+std::string
+Pathname::suffix() const {
+	const std::string& bname = path_list.back();
+	size_t x = bname.find_last_of('.');
+
+	if ( x == std::string::npos )
+		return "";
+	return bname.substr(x+1);	
+}
+
+std::string
+Pathname::filename() const {
+	const std::string& bname = path_list.back();
+	size_t x = bname.find_last_of('.');
+
+	if ( x == std::string::npos )
+		return bname;
+	return bname.substr(0,x);	
 }
 
 // End pathnames.cpp

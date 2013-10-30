@@ -24,6 +24,8 @@ public:	Pathname();
 
 	std::string basename() const;
 	std::string dirname() const;
+	std::string suffix() const;
+	std::string filename() const;
 };
 
 
