@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 // path_lists.cpp -- Pathname class implementation
 // Date: Mon Oct 28 21:29:53 2013
 ///////////////////////////////////////////////////////////////////////
@@ -17,17 +17,20 @@
 #include "pathnames.hpp"
 
 Pathname::Pathname() {
-	import(0);
+	init(0);
 }
 
 Pathname::Pathname(const char *path) {
-	import(path);
+	init(path);
 }
 
 void
-Pathname::import(const char *path) {
-	std::string p = path;
+Pathname::init(const char *path) {
+	std::string p;
 	std::vector<std::string> pvec;
+
+	if ( path )
+		p = path;
 
 	full = false;
 	path_list.clear();
@@ -93,6 +96,11 @@ Pathname::import(const char *path) {
 
 	pathstr = s.str();
 	pathcstr = pathstr.c_str();
+}
+
+void
+Pathname::import(const char *path) {
+	init(path);
 }
 
 const std::string&
