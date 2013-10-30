@@ -9,6 +9,7 @@
 #include "types.hpp"
 #include "registry.hpp"
 
+#include <unordered_map>
 
 class Cursor {
 	regid_t		bufid;		// Buffer ID
@@ -28,7 +29,12 @@ protected:
 
 public:	Buffer();
 	Buffer(const char *name);
+	~Buffer();
+
 	const std::string& name() const;
+
+	static Buffer *lookup(regid_t id);		// Locate a buffer by ID
+	static Buffer *lookup(const std::string& name);	// Locate a buffer by name
 };
 
 extern Registry buffer_registry;
