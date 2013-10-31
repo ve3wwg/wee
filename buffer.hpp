@@ -13,6 +13,10 @@
 #include <unordered_map>
 #include <vector>
 
+class Buffer;				// Forward declaration
+
+typedef std::vector<std::string> Region;
+
 class Cursor {
 	regid_t		bufid;		// Buffer ID
 	lineno_t	lno;		// Line no.
@@ -20,6 +24,9 @@ class Cursor {
 
 public:	Cursor(const char *bufname,lineno_t lno,colno_t col);
 	
+	inline Buffer *buffer();
+	inline lineno_t line()		{ return lno; }
+	inline colno_t column()		{ return col; }
 };
 
 
@@ -29,6 +36,8 @@ class Buffer {
 	Pathname	pathname;	// Pathname of file loaded
 
 	std::vector<std::string> content;
+
+	static std::unordered_map<regid_t,Buffer*> buffers_map;
 
 protected:
 	void init(const char *bufname);

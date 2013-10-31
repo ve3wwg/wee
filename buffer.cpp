@@ -16,8 +16,12 @@
 #include <sstream>
 #include <fstream>
 
-static std::unordered_map<regid_t,Buffer*> buffers_map;
 
+std::unordered_map<regid_t,Buffer*> Buffer::buffers_map;
+
+//////////////////////////////////////////////////////////////////////
+// Cursors
+//////////////////////////////////////////////////////////////////////
 
 Cursor::Cursor(const char *bufname,lineno_t lno,colno_t col) {
 	this->bufid = buffer_registry.lookup(bufname);
@@ -26,6 +30,16 @@ Cursor::Cursor(const char *bufname,lineno_t lno,colno_t col) {
 	this->lno = lno;
 	this->col = col;
 }
+
+//////////////////////////////////////////////////////////////////////
+// Buffers
+//////////////////////////////////////////////////////////////////////
+
+Buffer *
+Cursor::buffer() {
+ 	return Buffer::lookup(bufid);
+}
+
 
 Buffer::Buffer() {
 	Buffer::init(0);
@@ -65,9 +79,7 @@ Buffer::name() const {
 	return buffer_registry.reverse(bufid);
 }
 
-//////////////////////////////////////////////////////////////////////
 // Read a file into this buffer
-//////////////////////////////////////////////////////////////////////
 
 bool
 Buffer::read_file(const std::string& pathname) {
@@ -112,13 +124,13 @@ Buffer::dump() {
 }
 
 //////////////////////////////////////////////////////////////////////
-// Static Methods
+// Static Methods for Buffer
 //////////////////////////////////////////////////////////////////////
 
 Buffer *
 Buffer::lookup(regid_t id) {
-	auto it = buffers_map.find(id);
-	if ( it == buffers_map.end() )
+	auto it = Buffer::buffers_map.find(id);
+	if ( it == Buffer::buffers_map.end() )
 		return 0;		// Not found
 	return it->second;
 }
