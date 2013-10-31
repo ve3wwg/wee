@@ -114,8 +114,8 @@ Pathname::init(const char *path) {
 				pvec.erase(it);
 				f = true;
 				break;
-			} else if ( *it == ".." && it+1 != pvec.end() ) {
-				pvec.erase(it,it+2);
+			} else if ( *it == ".." && it != pvec.begin() ) {
+				pvec.erase(it-1,it+1);
 				f = true;
 				break;
 			}
