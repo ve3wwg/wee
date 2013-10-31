@@ -18,7 +18,6 @@
 #include "bindings.hpp"
 #include "buffer.hpp"
 
-Registry buffer_registry;
 Terminal term;
 Key_Bindings main_bindings;
 
