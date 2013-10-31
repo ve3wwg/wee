@@ -20,6 +20,7 @@ std::unordered_map<regid_t,Cursor*> 	Cursor::cursors_map;
 regid_t				   	Cursor::next_id = 100;
 
 std::unordered_map<regid_t,Buffer*> 	Buffer::buffers_map;
+Registry 				Buffer::buffer_registry;
 
 //////////////////////////////////////////////////////////////////////
 // Cursors
@@ -28,7 +29,7 @@ std::unordered_map<regid_t,Buffer*> 	Buffer::buffers_map;
 Cursor::Cursor(const char *bufname,lineno_t lno,colno_t col) {
 
 	this->csrid = next_id++;
-	this->bufid = buffer_registry.lookup(bufname);
+	this->bufid = Buffer::get_id(bufname);
 	assert(bufid);
 
 	this->lno = lno;
@@ -160,10 +161,17 @@ Buffer::lookup(regid_t id) {
 	return it->second;
 }
 
+regid_t
+Buffer::get_id(const std::string& name) {
+	return buffer_registry.lookup(name);
+}
+
 Buffer *
 Buffer::lookup(const std::string& name) {
-	regid_t bufid = buffer_registry.lookup(name);
-	return Buffer::lookup(bufid);
+	regid_t id = Buffer::get_id(name);
+	if ( !id )
+		return 0;
+	return Buffer::lookup(id);
 }
 
 // End buffer.cpp

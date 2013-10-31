@@ -50,6 +50,7 @@ class Buffer {
 	std::vector<std::string> content;
 
 	static std::unordered_map<regid_t,Buffer*> buffers_map;
+	static Registry buffer_registry;
 
 protected:
 	void init(const char *bufname);
@@ -68,10 +69,10 @@ public:	Buffer();
 	// Static Methods :
 
 	static Buffer *lookup(regid_t id);		// Locate a buffer by ID
+	static regid_t get_id(const std::string& name);	// Lookup buffer's ID
 	static Buffer *lookup(const std::string& name);	// Locate a buffer by name
 };
 
-extern Registry buffer_registry;
 
 #endif // BUFFER_HPP
 
