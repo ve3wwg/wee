@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/types.h>
+#include <pwd.h>
 #include <sys/param.h>
 #include <assert.h>
 
@@ -42,13 +44,52 @@ Pathname::init(const char *path) {
 	}
 
 	if ( p.size() > 0 && p[0] != '/' ) {
-		char cwd[MAXPATHLEN+1];
+		std::string first;
+		size_t x = p.find_first_of('/');
 
-		getcwd(cwd,MAXPATHLEN);
-		cwd[MAXPATHLEN] = 0;
-		p = cwd;
-		p += "/";
-		p += path;
+		if ( x != std::string::npos )
+			first = p.substr(0,x);
+		else	first = p;
+
+		if ( p != "~" ) {
+			char cwd[MAXPATHLEN+1];
+
+			getcwd(cwd,MAXPATHLEN);
+			cwd[MAXPATHLEN] = 0;
+			p = cwd;
+			p += "/";
+			p += path;
+		} else if ( p.size() > 1 && p[0] == '~' ) {
+			std::string username = p.substr(1);
+			struct passwd *pw = getpwent();
+		
+			while ( pw != 0 ) {
+				if ( username == pw->pw_name ) {
+					p = pw->pw_dir;
+					p += "/";
+					p += path;
+					break;
+				}
+			}
+			if ( !pw )
+				p = path;	// Punt
+		} else	{
+			uid_t uid = getuid();
+			struct passwd *pw = getpwuid(uid);
+			if ( pw ) {
+				p = pw->pw_dir;
+				p += "/";
+				p += path;
+			} else	{
+				const char *home = getenv("HOME");
+				
+				if ( home ) {
+					p = home;	// ${HOME}
+					p += "/";
+					p += path;
+				} else	p = path;	// I give up
+			}
+		}
 	}
 
 	full = p[0] == '/';
