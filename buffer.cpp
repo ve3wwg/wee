@@ -16,19 +16,44 @@
 #include <sstream>
 #include <fstream>
 
+std::unordered_map<regid_t,Cursor*> 	Cursor::cursors_map;
+regid_t				   	Cursor::next_id = 100;
 
-std::unordered_map<regid_t,Buffer*> Buffer::buffers_map;
+std::unordered_map<regid_t,Buffer*> 	Buffer::buffers_map;
 
 //////////////////////////////////////////////////////////////////////
 // Cursors
 //////////////////////////////////////////////////////////////////////
 
 Cursor::Cursor(const char *bufname,lineno_t lno,colno_t col) {
+
+	this->csrid = next_id++;
 	this->bufid = buffer_registry.lookup(bufname);
 	assert(bufid);
 
 	this->lno = lno;
 	this->col = col;
+
+	cursors_map[this->csrid] = this;
+}
+
+Cursor::~Cursor() {
+	auto it = cursors_map.find(csrid);
+	assert(it != cursors_map.end());
+	cursors_map.erase(it);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Static methods for Cursors
+//////////////////////////////////////////////////////////////////////
+
+Cursor *
+Cursor::lookup(csrid_t id) {
+
+	auto it = Cursor::cursors_map.find(id);
+	if ( it == Cursor::cursors_map.end() )
+		return 0;		// Not found
+	return it->second;
 }
 
 //////////////////////////////////////////////////////////////////////

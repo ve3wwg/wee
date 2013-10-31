@@ -17,17 +17,29 @@ class Buffer;				// Forward declaration
 
 typedef std::vector<std::string> Region;
 
+typedef long		csrid_t;
+
 class Cursor {
+	csrid_t		csrid;		// ID of this cursor
 	regid_t		bufid;		// Buffer ID
 	lineno_t	lno;		// Line no.
 	colno_t		col;		// Column no. within the line
 
+	static std::unordered_map<regid_t,Cursor*> cursors_map;
+	static csrid_t				   next_id;
+
 public:	Cursor(const char *bufname,lineno_t lno,colno_t col);
+	~Cursor();
 	
+	inline csrid_t id()		{ return csrid; }
 	inline Buffer *buffer();
 	inline lineno_t line()		{ return lno; }
 	inline colno_t column()		{ return col; }
+
+	// Static methods
+	static Cursor *lookup(csrid_t id);
 };
+
 
 
 class Buffer {
