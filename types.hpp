@@ -8,7 +8,7 @@
 
 typedef long 			regid_t;	// Registry ID type
 
-typedef unsigned long		lineno_t;	// Line no.
+typedef size_t			lineno_t;	// Line no.
 typedef unsigned		colno_t;	// Column no. within a line
 
 #endif // TYPES_HPP
