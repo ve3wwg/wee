@@ -11,6 +11,7 @@
 #include <assert.h>
 
 #include "buffer.hpp"
+#include "view.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -173,6 +174,7 @@ Buffer::init(const char *bufname) {
 }
 
 Buffer::~Buffer() {
+	View::buffer_destroyed(bufid);			// Disassociate from all views
 	Cursor::destroyed(bufid);			// Tell cursors about this buffer's demise
 	buffers_map.erase(bufid);			// Remove this buffer from list of all bufs
 }
