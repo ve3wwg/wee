@@ -24,6 +24,7 @@ class Cursor {
 	regid_t		bufid;		// Buffer ID
 	lineno_t	lno;		// Line no.
 	colno_t		col;		// Column no. within the line
+	bool		end_file;	// True if this cursor follows end of buffer
 
 	typedef std::unordered_map<regid_t,Cursor*> csrmap_t;		// Map of cursors
 
@@ -49,6 +50,7 @@ public:	Cursor();
 	// Static methods
 	static Cursor *lookup(csrid_t id);
 	static void destroyed(regid_t bufid);
+	static void reloaded(regid_t bufid);
 };
 
 
@@ -74,6 +76,7 @@ public:	Buffer();
 
 	const std::string& name() const;
 	inline const std::string& error() const { return errmsg; }
+	inline size_t length() const		{ return content.size(); }
 
 	bool read_file(const std::string& pathname);
 

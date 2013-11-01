@@ -32,6 +32,7 @@ Cursor::Cursor() {
 	bufid = 0;
 	lno = 0;
 	col = 0;
+	end_file = 0;
 
 	register_cursor();
 }
@@ -46,6 +47,14 @@ Cursor::Cursor(const char *bufname,lineno_t lno,colno_t col) {
 	this->col = col;
 
 	register_cursor();
+
+	Buffer *buf = Buffer::lookup(this->bufid);
+	size_t lines = buf->length();
+
+	if ( this->lno >= lines ) {
+		this->lno = lines + 1;
+		end_file = true;
+	} else	end_file = false;
 }
 
 Cursor::~Cursor() {
@@ -106,6 +115,22 @@ Cursor::destroyed(regid_t bufid) {
 		zmap[csr->bufid] = csr;
 	}
 	buffers_map.erase(bufid);
+}
+
+// Buffer was reloaded with new content
+
+void
+Cursor::reloaded(regid_t bufid) {
+	csrmap_t& map = buffers_map[bufid];
+
+	for ( auto it = map.begin(); it != map.end(); ++it ) {
+		Cursor *csr = it->second;
+		if ( csr->end_file ) {
+			Buffer *buf = Buffer::lookup(bufid);
+			size_t lines = buf->length();
+			csr->lno = lines+1;
+		} else	csr->lno = 0;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -187,6 +212,8 @@ std::cout << "EOF\n";
 
 	is.close();
 	errmsg = "";
+
+	Cursor::reloaded(bufid);
 	return true;
 }
 
