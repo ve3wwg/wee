@@ -25,10 +25,18 @@ class Cursor {
 	lineno_t	lno;		// Line no.
 	colno_t		col;		// Column no. within the line
 
-	static std::unordered_map<regid_t,Cursor*> cursors_map;
-	static csrid_t				   next_id;
+	typedef std::unordered_map<regid_t,Cursor*> csrmap_t;		// Map of cursors
 
-public:	Cursor(const char *bufname,lineno_t lno,colno_t col);
+	static csrmap_t				   cursors_map;		// csrid => Cursor *
+	static csrid_t				   next_id;
+	static std::unordered_map<regid_t,csrmap_t> buffers_map;	// Bufid => cursors map
+
+protected:
+	void register_cursor();
+	void unregister_cursor();
+
+public:	Cursor();
+	Cursor(const char *bufname,lineno_t lno,colno_t col);
 	~Cursor();
 	
 	inline csrid_t id()		{ return csrid; }
@@ -36,8 +44,11 @@ public:	Cursor(const char *bufname,lineno_t lno,colno_t col);
 	inline lineno_t line()		{ return lno; }
 	inline colno_t column()		{ return col; }
 
+	void reassociate(Buffer *buf);
+
 	// Static methods
 	static Cursor *lookup(csrid_t id);
+	static void destroyed(regid_t bufid);
 };
 
 
@@ -59,6 +70,8 @@ public:	Buffer();
 	Buffer(const char *name);
 	~Buffer();
 
+	inline regid_t get_id()		{ return bufid; }
+
 	const std::string& name() const;
 	inline const std::string& error() const { return errmsg; }
 
@@ -68,9 +81,9 @@ public:	Buffer();
 
 	// Static Methods :
 
-	static Buffer *lookup(regid_t id);		// Locate a buffer by ID
-	static regid_t get_id(const std::string& name);	// Lookup buffer's ID
-	static Buffer *lookup(const std::string& name);	// Locate a buffer by name
+	static Buffer *lookup(regid_t id);			// Locate a buffer by ID
+	static regid_t lookup_id(const std::string& name);	// Lookup buffer's ID
+	static Buffer *lookup(const std::string& name);		// Locate a buffer by name
 };
 
 

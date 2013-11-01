@@ -16,7 +16,8 @@
 #include <sstream>
 #include <fstream>
 
-std::unordered_map<regid_t,Cursor*> 	Cursor::cursors_map;
+Cursor::csrmap_t			Cursor::cursors_map;		// csrid => Cursor *
+std::unordered_map<regid_t,Cursor::csrmap_t> Cursor::buffers_map;	// Bufid => cursors map
 regid_t				   	Cursor::next_id = 100;
 
 std::unordered_map<regid_t,Buffer*> 	Buffer::buffers_map;
@@ -26,22 +27,57 @@ Registry 				Buffer::buffer_registry;
 // Cursors
 //////////////////////////////////////////////////////////////////////
 
+Cursor::Cursor() {
+	csrid = next_id++;
+	bufid = 0;
+	lno = 0;
+	col = 0;
+
+	register_cursor();
+}
+
 Cursor::Cursor(const char *bufname,lineno_t lno,colno_t col) {
 
 	this->csrid = next_id++;
-	this->bufid = Buffer::get_id(bufname);
+	this->bufid = Buffer::lookup_id(bufname);
 	assert(bufid);
 
 	this->lno = lno;
 	this->col = col;
 
-	cursors_map[this->csrid] = this;
+	register_cursor();
 }
 
 Cursor::~Cursor() {
-	auto it = cursors_map.find(csrid);
-	assert(it != cursors_map.end());
-	cursors_map.erase(it);
+	unregister_cursor();
+}
+
+void
+Cursor::register_cursor() {
+	cursors_map[csrid] = this;
+	csrmap_t& map = buffers_map[bufid];
+	map[csrid] = this;
+}
+
+void
+Cursor::unregister_cursor() {
+	csrmap_t& map = buffers_map[bufid];
+	map.erase(csrid);
+	cursors_map.erase(csrid);
+}
+
+// Reassociate cursor to new buffer
+
+void
+Cursor::reassociate(Buffer *buf) {
+	csrmap_t& omap = buffers_map[bufid];
+	omap.erase(csrid);
+	if ( omap.size() == 0 )
+		buffers_map.erase(bufid);
+
+	bufid = buf->get_id();
+	csrmap_t nmap = buffers_map[bufid];
+	nmap[csrid] = this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -55,6 +91,21 @@ Cursor::lookup(csrid_t id) {
 	if ( it == Cursor::cursors_map.end() )
 		return 0;		// Not found
 	return it->second;
+}
+
+// Buffer bufid was/is destroyed
+
+void
+Cursor::destroyed(regid_t bufid) {
+	csrmap_t& omap = buffers_map[bufid];
+	csrmap_t& zmap = buffers_map[0];
+
+	for ( auto it = omap.begin(); it != omap.end(); ++it ) {
+		Cursor *csr = it->second;
+		csr->bufid = 0;
+		zmap[csr->bufid] = csr;
+	}
+	buffers_map.erase(bufid);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -97,7 +148,8 @@ Buffer::init(const char *bufname) {
 }
 
 Buffer::~Buffer() {
-	buffers_map.erase(bufid);
+	Cursor::destroyed(bufid);			// Tell cursors about this buffer's demise
+	buffers_map.erase(bufid);			// Remove this buffer from list of all bufs
 }
 
 const std::string&
@@ -162,13 +214,13 @@ Buffer::lookup(regid_t id) {
 }
 
 regid_t
-Buffer::get_id(const std::string& name) {
+Buffer::lookup_id(const std::string& name) {
 	return buffer_registry.lookup(name);
 }
 
 Buffer *
 Buffer::lookup(const std::string& name) {
-	regid_t id = Buffer::get_id(name);
+	regid_t id = Buffer::lookup_id(name);
 	if ( !id )
 		return 0;
 	return Buffer::lookup(id);
