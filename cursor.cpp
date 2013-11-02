@@ -29,6 +29,12 @@ Cursor::Cursor() {
 	register_cursor();
 }
 
+Cursor::Cursor(const Cursor& csr) {
+	(*this) = csr;
+	this->csrid = next_id++;
+	register_cursor();
+}
+
 Cursor::Cursor(const char *bufname,lineno_t lno,colno_t col) {
 
 	this->csrid = next_id++;
@@ -90,6 +96,11 @@ Cursor::reassociate(Buffer *buf) {
 	bufid = buf->get_id();
 	csrmap_t nmap = buffers_map[bufid];
 	nmap[csrid] = this;
+}
+
+Buffer *
+Cursor::buffer() {
+	return Buffer::lookup(bufid);
 }
 
 //////////////////////////////////////////////////////////////////////

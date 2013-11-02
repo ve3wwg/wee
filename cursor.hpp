@@ -30,12 +30,13 @@ protected:
 	void unregister_cursor();
 
 public:	Cursor();
+	Cursor(const Cursor& csr);
 	Cursor(regid_t,lineno_t lno=0,colno_t col=0);
 	Cursor(const char *bufname,lineno_t lno,colno_t col);
 	~Cursor();
 	
 	inline csrid_t id()		{ return csrid; }
-	inline Buffer *buffer();
+	Buffer *buffer();
 	inline lineno_t line()		{ return lno; }
 	inline colno_t column()		{ return col; }
 
