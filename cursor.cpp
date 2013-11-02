@@ -61,7 +61,6 @@ Cursor::Cursor(regid_t bufid,lineno_t lno,colno_t col) {
 	this->bufid = bufid;
 	this->lno = lno;
 	this->col = col;
-	assert(this->bufid);
 	end_file = false;
 	register_cursor();
 }
