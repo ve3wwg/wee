@@ -7,6 +7,7 @@
 #define VIEW_HPP
 
 #include "term.hpp"
+#include "cursor.hpp"
 #include "buffer.hpp"
 
 #include <unordered_map>
