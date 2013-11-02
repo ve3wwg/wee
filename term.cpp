@@ -15,7 +15,7 @@
 #include "term.hpp"
 
 
-std::unordered_map<int,int>	Terminal::acs_map;
+std::unordered_map<int,long>	Terminal::wee_acs_map;
 
 
 Terminal::Terminal() {
@@ -127,13 +127,13 @@ Terminal::init() {
 	if ( has_colour )
 		set_fg(White).set_bg(Black);
 
-	if ( acs_map.size() == 0 ) {
+	if ( wee_acs_map.size() == 0 ) {
 		//////////////////////////////////////////////////////
 		// Initialize the ACS Character Set
 		//////////////////////////////////////////////////////
 		static struct {
 			Graphic	graphic;
-			int	acs_int;
+			long	acs_int;
 		} graphics[] = {
 			{ acs_ulcorner,	ACS_ULCORNER },	// upper left corner
 			{ acs_llcorner,	ACS_LLCORNER },	// lower left corner
@@ -172,9 +172,9 @@ Terminal::init() {
 
 		for ( int x=0; graphics[x].acs_int != 0; ++x ) {
 			int gx = int(graphics[x].graphic);
-			acs_map[gx] = graphics[x].acs_int;
+			wee_acs_map[gx] = graphics[x].acs_int;
 		}
-	};
+	}
 }
 
 Terminal&
@@ -263,24 +263,11 @@ Terminal::put(int acs) {
 	static int last_ch = -1;
 	static int last_acs = '@';
 
-	{
-		size_t n = acs_map.size();
-
-		(void) n;
-
-		for ( auto it=acs_map.begin(); it != acs_map.end(); ++it ) {
-			int key = it->first;
-			int chr = it->second;
-			(void)key;
-			(void)chr;
-		}
-	}
-
 	if ( last_ch == acs ) {
 		::addch(last_acs);
 	} else	{
-		std::unordered_map<int,int>::iterator it = acs_map.find(acs);
-		if ( it == acs_map.end() ) {
+		auto it = wee_acs_map.find(acs);
+		if ( it == wee_acs_map.end() ) {
 			::addch(acs);
 		} else	{
 			last_ch = acs;

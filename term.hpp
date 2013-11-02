@@ -80,7 +80,7 @@ private:
 	void colours_init();
 	void set_pair(short pair);
 
-	static std::unordered_map<int,int>	acs_map;
+	static std::unordered_map<int,long>	wee_acs_map;
 
 public:	Terminal();
 	~Terminal();
