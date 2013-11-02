@@ -17,6 +17,7 @@
 #include "dispatch.hpp"
 #include "bindings.hpp"
 #include "buffer.hpp"
+#include "view.hpp"
 
 Terminal term;
 Key_Bindings main_bindings;
@@ -80,6 +81,11 @@ main(int argc,char **argv) {
 	rc = tcgetattr(0,&ios);			// Get current tty settings
 	ios.c_lflag &= ~ISIG;			// No signal generation
 	rc = tcsetattr(0,TCSAFLUSH,&ios);
+
+	(void) new View(term);			// Create one view
+	View& main = View::focus();		// Get the focus view
+
+	main.draw();
 
 	for (;;) {
 		keystroke = term.get();
