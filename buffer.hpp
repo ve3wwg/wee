@@ -40,6 +40,8 @@ public:	Buffer();
 	inline const std::string& error() const { return errmsg; }
 	inline size_t length() const		{ return content.size(); }
 
+	void get_line(std::string& text,lineno_t lno);
+
 	bool read_file(const std::string& pathname);
 
 	void dump();

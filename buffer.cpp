@@ -22,12 +22,6 @@ std::unordered_map<regid_t,Buffer*> 	Buffer::buffers_map;
 Registry 				Buffer::buffer_registry;
 
 
-Buffer *
-Cursor::buffer() {
- 	return Buffer::lookup(bufid);
-}
-
-
 Buffer::Buffer() {
 	Buffer::init(0);
 }
@@ -100,6 +94,17 @@ Buffer::read_file(const std::string& pathname) {
 
 	Cursor::reloaded(bufid);
 	return true;
+}
+
+void
+Buffer::get_line(std::string& text,lineno_t lno) {
+
+	if ( lno < content.size() ) {
+		text = content[lno];
+	} else	{
+		assert(lno == content.size());
+		text.clear();
+	}
 }
 
 void
