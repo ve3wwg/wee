@@ -20,7 +20,6 @@ View					*View::main_view = 0;
 View::View(Terminal& term) {
 	id = next_id++;			// View ID
 	this->term = &term;		// Keep ref to our physical screen
-	top = 0;			// No cursor yet
 	views_map[id] = this;
 	offset = 0;
 	width = term.get_cols();	// By default, assume full width of terminal
@@ -76,28 +75,25 @@ View::draw_status() {
 	if ( bufname.size() > 0 ) {
 		size_t end = pos + bufname.size();
 
-		if ( end >= text.size() ) {
+		if ( end >= text.size() )
 			bufname.resize(text.size() - pos - 2 );
-			text.replace(pos,bufname.size(),bufname);
-			pos += bufname.size();
-		}
+		text.replace(pos,bufname.size(),bufname);
+		pos += bufname.size();
 	}
-	text[pos++] = ' ';
 	text[pos++] = char(Terminal::acs_ltee);
 
 	pos += 2;
 	text[pos++] = char(Terminal::acs_rtee);
 
-	text.replace(pos,7," File: ");
-	pos += 7;
+	text.replace(pos,6,"File: ");
+	pos += 6;
 
 	if ( pos + pathname.size() > text.size() )
 		pathname.resize(text.size() - pos);
 
 	text.replace(pos,pathname.size(),pathname);
+	pos += pathname.size();
 
-	if ( pos < text.size() )
-		text[pos++] = ' ';
 	if ( pos < text.size() )
 		text[pos++] = char(Terminal::acs_ltee);
 
