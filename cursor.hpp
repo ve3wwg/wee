@@ -30,6 +30,7 @@ protected:
 	void unregister_cursor();
 
 public:	Cursor();
+	Cursor(regid_t,lineno_t lno=0,colno_t col=0);
 	Cursor(const char *bufname,lineno_t lno,colno_t col);
 	~Cursor();
 	

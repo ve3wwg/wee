@@ -38,8 +38,6 @@ Cursor::Cursor(const char *bufname,lineno_t lno,colno_t col) {
 	this->lno = lno;
 	this->col = col;
 
-	register_cursor();
-
 	Buffer *buf = Buffer::lookup(this->bufid);
 	size_t lines = buf->length();
 
@@ -47,6 +45,19 @@ Cursor::Cursor(const char *bufname,lineno_t lno,colno_t col) {
 		this->lno = lines + 1;
 		end_file = true;
 	} else	end_file = false;
+
+	register_cursor();
+}
+
+Cursor::Cursor(regid_t bufid,lineno_t lno,colno_t col) {
+
+	csrid = next_id++;
+	this->bufid = bufid;
+	this->lno = lno;
+	this->col = col;
+	assert(this->bufid);
+	end_file = false;
+	register_cursor();
 }
 
 Cursor::~Cursor() {

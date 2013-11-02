@@ -13,6 +13,8 @@
 #include <unordered_map>
 #include <vector>
 
+class Cursor;
+
 class Buffer {
 	regid_t		bufid;		// Buffer's ID value 
 	std::string	errmsg;		// Last deposited error message
@@ -31,6 +33,8 @@ public:	Buffer();
 	~Buffer();
 
 	inline regid_t get_id()		{ return bufid; }
+
+	Cursor *new_cursor();		// Create a cursor for this buffer
 
 	const std::string& name() const;
 	inline const std::string& error() const { return errmsg; }

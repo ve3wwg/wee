@@ -11,6 +11,7 @@
 #include <assert.h>
 
 #include "buffer.hpp"
+#include "cursor.hpp"
 #include "view.hpp"
 
 #include <iostream>
@@ -60,6 +61,11 @@ Buffer::~Buffer() {
 	View::buffer_destroyed(bufid);			// Disassociate from all views
 	Cursor::destroyed(bufid);			// Tell cursors about this buffer's demise
 	buffers_map.erase(bufid);			// Remove this buffer from list of all bufs
+}
+
+Cursor *
+Buffer::new_cursor() {
+	return new Cursor(bufid);
 }
 
 const std::string&
