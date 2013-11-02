@@ -14,6 +14,7 @@
 
 viewid_t				View::next_id = 1;
 std::unordered_map<viewid_t,View*>	View::views_map;
+View					*View::main_view = 0;
 
 
 View::View(Terminal& term) {
@@ -23,6 +24,14 @@ View::View(Terminal& term) {
 	views_map[id] = this;
 	offset = 0;
 	width = term.get_cols();	// By default, assume full width of terminal
+	height = term.get_lines() - 1;	// Leave bottom line for prompting
+
+	if ( !main_view )
+		main_view = this;	// First view becomes the main view
+
+	topline = 0;			// Assume top terminal line
+	left = 0;			// Assume leftmost terminal column
+	statline = height - 1;		// Location of status line
 }
 
 View::~View() {
@@ -40,6 +49,41 @@ View::disassociate(regid_t bufid) {
 void
 View::associate(const Cursor& bufref) {
 	top = bufref;
+}
+
+void
+View::draw_status() {
+	std::string text;
+
+	text.append(256,main_view == this ? '=' : '-');
+	text.replace(5,10," Wee-1.0 (");
+
+	size_t mode_pos = 15;
+
+	text.replace(mode_pos,2,") ");
+	text.resize(width);
+
+	size_t bufname_pos = mode_pos + 2 + 2;
+
+	text.replace(bufname_pos++,1," ");
+	if ( top.get_bufid() ) {
+		std::string bufname = top.buffer()->name();
+		size_t end = bufname_pos + bufname.size();
+
+		if ( end >= text.size() ) {
+			bufname.resize(text.size() - bufname_pos - 2 );
+			text.replace(bufname_pos,bufname.size(),bufname);
+			bufname_pos += bufname.size();
+		}
+	}
+	text.replace(bufname_pos,1," ");
+
+	term->mvput(statline,left,text);
+}
+
+void
+View::draw() {
+	draw_status();
 }
 
 void
@@ -82,6 +126,13 @@ View::buffer_destroyed(regid_t bufid) {
 		View *view = it->second;
 		view->disassociate(bufid);
 	}
+}
+
+// Return the main or focused view
+
+View&
+View::focus() {
+	return *main_view;
 }
 
 // End view.cpp
