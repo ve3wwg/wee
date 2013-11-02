@@ -103,18 +103,27 @@ View::draw_status() {
 
 void
 View::draw() {
+
+	for ( size_t vx=0; vx < height; ++vx ) {
+		lineno_t y = topline + vx;
+		std::string text;
+
+		fetch_line(text,vx);
+		term->mvput(y,left,text);
+	}
+
 	draw_status();
 }
 
 void
-View::fetch_line(std::string& text,int tline) {
+View::fetch_line(std::string& text,int vline) {
 	text.clear();
 
 	if ( top.get_bufid() ) {
 		Buffer *buf = top.buffer();
 		if ( buf ) {
 			lineno_t lines = buf->length();	// # of lines in buffer
-			lineno_t curline = top.line();
+			lineno_t curline = top.line() + vline;
 			if ( curline < lines ) {
 				std::string temp;
 				buf->get_line(temp,curline);
@@ -129,8 +138,8 @@ View::fetch_line(std::string& text,int tline) {
 	}
 
 	if ( text.size() < width )
-		text.append(' ',width - text.size());
-	if ( text.size() > width )
+		text.append(width - text.size(),' ');
+	else if ( text.size() > width )
 		text.resize(width);
 	assert(text.size() == width);
 }
