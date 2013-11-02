@@ -199,4 +199,22 @@ Terminal::bottomf(const char *format,...) {
 	::addstr(temp);
 }
 
+Terminal&
+Terminal::move(lineno_t y,colno_t x) {
+	::move(y,x);
+	return *this;
+}
+
+Terminal&
+Terminal::put(const std::string& text) {
+	::addstr(text.c_str());
+	return *this;
+}
+
+Terminal&
+Terminal::mvput(lineno_t y,colno_t x,const std::string& text) {
+	mvaddstr(y,x,text.c_str());
+	return *this;
+}
+
 // End term.cpp

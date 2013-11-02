@@ -6,6 +6,10 @@
 #ifndef TERM_HPP
 #define TERM_HPP
 
+#include "types.hpp"
+
+#include <string>
+
 typedef int	keych_t;
 
 class Terminal {
@@ -30,8 +34,8 @@ class Terminal {
 	bool		has_bold;
 	bool		has_altcharset;
 
-	int		scr_lines;
-	int		scr_cols;
+	lineno_t	scr_lines;
+	colno_t		scr_cols;
 
 	short		bgpair;
 
@@ -59,6 +63,10 @@ public:	Terminal();
 	void mvbottom();
 	void mvclear_botline();
 	void bottomf(const char *format,...);
+
+	Terminal& move(lineno_t y,colno_t x);
+	Terminal& put(const std::string& text);
+	Terminal& mvput(lineno_t y,colno_t x,const std::string& text);
 };
 
 
