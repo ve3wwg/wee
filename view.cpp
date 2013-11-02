@@ -21,6 +21,7 @@ View::View(Terminal& term) {
 	this->term = &term;		// Keep ref to our physical screen
 	top = 0;			// No cursor yet
 	views_map[id] = this;
+	offset = 0;
 }
 
 View::~View() {
@@ -34,8 +35,37 @@ View::disassociate(regid_t bufid) {
 }
 
 void
-View::associate(const Cursor& model) {
+View::associate(const Cursor& bufref) {
+	if ( top )
+		delete top;
+	top = new Cursor(bufref);
 }
+
+void
+View::fetch_line(std::string& text,int tline) {
+	text.clear();
+	if ( !top )
+		return;			// No associated buffer
+
+	Buffer *buf = top->buffer();
+	if ( !buf )
+		return;			// Still no buffer
+
+	lineno_t lines = buf->length();	// # of lines in buffer
+	lineno_t curline = top->line();
+	if ( curline >= lines )
+		return;
+
+	std::string temp;
+	buf->get_line(temp,curline);
+
+	if ( !offset || offset >= text.size() ) {
+		text = temp;
+	} else	{
+		text = temp.substr(offset);
+	}
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // Static Methods

@@ -16,14 +16,18 @@ class View {
 	viewid_t	id;		// View ID
 	Terminal	*term;		// Terminal associated with this view
 	Cursor		*top;		// Top cursor, if any
+	colno_t		offset;		// Column offset, else 0
 
 	static viewid_t			next_id;
 	static std::unordered_map<viewid_t,View*> views_map;
 
+protected:
+	void fetch_line(std::string& text,int tline);
+
 public:	View(Terminal& term);
 	~View();
 
-	void associate(const Cursor& model);	// Ref to top line of buffer to display in view
+	void associate(const Cursor& bufref);	// Ref to top line of buffer to display in view
 	void disassociate(regid_t bufid);	// A buffer was destroyed
 
 	// Static methods
