@@ -84,6 +84,20 @@ Cursor::unregister_cursor() {
 	cursors_map.erase(csrid);
 }
 
+// Disassociate from all buffers
+
+void
+Cursor::disassociate() {
+	csrmap_t& omap = buffers_map[bufid];
+	omap.erase(csrid);
+	if ( omap.size() == 0 )
+		buffers_map.erase(bufid);
+
+	bufid = 0;
+	csrmap_t nmap = buffers_map[bufid];
+	nmap[csrid] = this;
+}
+
 // Reassociate cursor to new buffer
 
 void

@@ -36,11 +36,13 @@ public:	Cursor();
 	~Cursor();
 	
 	inline csrid_t id()		{ return csrid; }
+	inline regid_t get_bufid()	{ return bufid; }
 	Buffer *buffer();
 	inline lineno_t line()		{ return lno; }
 	inline colno_t column()		{ return col; }
 
 	void reassociate(Buffer *buf);
+	void disassociate();		// Disassociate from buffer
 
 	// Static methods
 	static Cursor *lookup(csrid_t id);
