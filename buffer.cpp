@@ -32,20 +32,18 @@ Buffer::Buffer(const char *bufname) {
 
 void
 Buffer::init(const char *bufname) {
-	bufid = buffer_registry.get_next_id();
-	regid_t id = 0;
-
 	if ( bufname ) {
-		id = buffer_registry.lookup(bufname);	// Does this name already exist?
-		if ( id != 0 )
+		bufid = buffer_registry.lookup(bufname); // Does this name already exist?
+		if ( bufid != 0 )
 			bufname = 0;			// Make a new buffer name up
+		else	bufid = buffer_registry.create(bufname);// Register buffer name
 	}
 
 	if ( !bufname ) {
 		std::stringstream s;
 
 		s << "$buf" << bufid;
-		id = buffer_registry.create(s.str());	// Returns 0 if the buffer exists
+		bufid = buffer_registry.create(s.str()); // Returns 0 if the buffer exists
 	}
 
 	buffers_map[bufid] = this;			// Register this new buffer
