@@ -39,6 +39,7 @@ public:	Buffer();
 	const std::string& name() const;
 	inline const std::string& error() const { return errmsg; }
 	inline size_t length() const		{ return content.size(); }
+	inline const std::string& get_pathname() { return pathname.pathname(); }
 
 	void get_line(std::string& text,lineno_t lno);
 

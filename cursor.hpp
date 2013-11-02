@@ -32,7 +32,7 @@ protected:
 public:	Cursor();
 	Cursor(const Cursor& csr);
 	Cursor(regid_t,lineno_t lno=0,colno_t col=0);
-	Cursor(const char *bufname,lineno_t lno,colno_t col);
+	Cursor(const char *bufname,lineno_t lno=0,colno_t col=0);
 	~Cursor();
 	
 	inline csrid_t id()		{ return csrid; }

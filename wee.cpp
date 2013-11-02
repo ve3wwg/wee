@@ -84,6 +84,15 @@ main(int argc,char **argv) {
 
 	(void) new View(term);			// Create one view
 	View& main = View::focus();		// Get the focus view
+	Buffer mbuf("main");
+
+	mbuf.read_file("wee.cpp");
+
+	{
+		Cursor *csr = mbuf.new_cursor();
+		main.associate(*csr);
+		delete csr;
+	}
 
 	main.draw();
 

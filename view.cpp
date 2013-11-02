@@ -54,6 +54,13 @@ View::associate(const Cursor& bufref) {
 void
 View::draw_status() {
 	std::string text;
+	std::string bufname, pathname;
+
+	Buffer *buf = top.buffer();
+	if ( buf ) {
+		bufname = buf->name();
+		pathname = buf->get_pathname();
+	}
 
 	text.append(256,char(Terminal::acs_hline));
 	text.replace(5,10," Wee-1.0 (");
@@ -63,21 +70,38 @@ View::draw_status() {
 	text.replace(mode_pos,2,") ");
 	text.resize(width);
 
-	size_t bufname_pos = mode_pos + 2 + 2;
+	size_t pos = mode_pos + 2 + 2;
+	text[pos++] = char(Terminal::acs_rtee);
 
-	text.replace(bufname_pos++,1," ");
-	if ( top.get_bufid() ) {
-		std::string bufname = top.buffer()->name();
-		size_t end = bufname_pos + bufname.size();
+	if ( bufname.size() > 0 ) {
+		size_t end = pos + bufname.size();
 
 		if ( end >= text.size() ) {
-			bufname.resize(text.size() - bufname_pos - 2 );
-			text.replace(bufname_pos,bufname.size(),bufname);
-			bufname_pos += bufname.size();
+			bufname.resize(text.size() - pos - 2 );
+			text.replace(pos,bufname.size(),bufname);
+			pos += bufname.size();
 		}
 	}
-	text.replace(bufname_pos,1," ");
+	text[pos++] = ' ';
+	text[pos++] = char(Terminal::acs_ltee);
 
+	pos += 2;
+	text[pos++] = char(Terminal::acs_rtee);
+
+	text.replace(pos,7," File: ");
+	pos += 7;
+
+	if ( pos + pathname.size() > text.size() )
+		pathname.resize(text.size() - pos);
+
+	text.replace(pos,pathname.size(),pathname);
+
+	if ( pos < text.size() )
+		text[pos++] = ' ';
+	if ( pos < text.size() )
+		text[pos++] = char(Terminal::acs_ltee);
+
+	text.resize(width);
 	term->mvput(statline,left,text);
 }
 
