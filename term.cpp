@@ -14,6 +14,10 @@
 
 #include "term.hpp"
 
+
+std::unordered_map<int,int>	Terminal::acs_map;
+
+
 Terminal::Terminal() {
 	initialized 	= false;
 	has_colour 	= false;
@@ -122,6 +126,55 @@ Terminal::init() {
 
 	if ( has_colour )
 		set_fg(White).set_bg(Black);
+
+	if ( acs_map.size() == 0 ) {
+		//////////////////////////////////////////////////////
+		// Initialize the ACS Character Set
+		//////////////////////////////////////////////////////
+		static struct {
+			Graphic	graphic;
+			int	acs_int;
+		} graphics[] = {
+			{ acs_ulcorner,	ACS_ULCORNER },	// upper left corner
+			{ acs_llcorner,	ACS_LLCORNER },	// lower left corner
+			{ acs_urcorner,	ACS_URCORNER },	// upper right corner
+			{ acs_lrcorner,	ACS_LRCORNER },	// lower right corner
+			{ acs_ltee,	ACS_LTEE },	// tee pointing right
+			{ acs_rtee,	ACS_RTEE },	// tee pointing left
+			{ acs_btee,	ACS_BTEE },	// tee pointing up
+			{ acs_ttee,	ACS_TTEE },	// tee pointing down
+			{ acs_hline,	ACS_HLINE },	// horizontal line
+			{ acs_vline,	ACS_VLINE },	// vertical line
+			{ acs_plus,	ACS_PLUS },	// large plus or crossover
+			{ acs_s1,	ACS_S1 },	// scan line 1
+			{ acs_s9,	ACS_S9 },	// scan line 9
+			{ acs_diamond,	ACS_DIAMOND },	// diamond
+			{ acs_ckboard,	ACS_CKBOARD },	// checker board (stipple)
+			{ acs_degree,	ACS_DEGREE },	// degree symbol
+			{ acs_plminus,	ACS_PLMINUS },	// plus/minus
+			{ acs_bullet,	ACS_BULLET },	// bullet
+			{ acs_larrow,	ACS_LARROW },	// arrow pointing left
+			{ acs_rarrow,	ACS_RARROW },	// arrow pointing right
+			{ acs_darrow,	ACS_DARROW },	// arrow pointing down
+			{ acs_uarrow,	ACS_UARROW },	// arrow pointing up
+			{ acs_board,	ACS_BOARD },	// board of squares
+			{ acs_lantern,	ACS_LANTERN },	// lantern symbol
+			{ acs_block,	ACS_BLOCK },	// solid square block
+			{ acs_s3,	ACS_S3 },	// scan line 3
+			{ acs_s7,	ACS_S7 },	// scan line 7
+			{ acs_lequal,	ACS_LEQUAL },	// less/equal
+			{ acs_gequal,	ACS_GEQUAL },	// greater/equal
+			{ acs_pi,	ACS_PI },	// Pi
+			{ acs_nequal,	ACS_NEQUAL },	// not equal
+			{ acs_sterling,	ACS_STERLING },	// UK pound sign
+			{ acs_sterling , 0 }
+		};
+
+		for ( int x=0; graphics[x].acs_int != 0; ++x ) {
+			int gx = int(graphics[x].graphic);
+			acs_map[gx] = graphics[x].acs_int;
+		}
+	};
 }
 
 Terminal&
@@ -206,14 +259,49 @@ Terminal::move(lineno_t y,colno_t x) {
 }
 
 Terminal&
+Terminal::put(int acs) {
+	static int last_ch = -1;
+	static int last_acs = '@';
+
+	{
+		size_t n = acs_map.size();
+
+		(void) n;
+
+		for ( auto it=acs_map.begin(); it != acs_map.end(); ++it ) {
+			int key = it->first;
+			int chr = it->second;
+			(void)key;
+			(void)chr;
+		}
+	}
+
+	if ( last_ch == acs ) {
+		::addch(last_acs);
+	} else	{
+		std::unordered_map<int,int>::iterator it = acs_map.find(acs);
+		if ( it == acs_map.end() ) {
+			::addch(acs);
+		} else	{
+			last_ch = acs;
+			last_acs = it->second;
+			::addch(last_acs);
+		}
+	}
+	return *this;
+}
+
+Terminal&
 Terminal::put(const std::string& text) {
-	::addstr(text.c_str());
+	for ( size_t x=0; x < text.size(); ++x )
+		put(int(text[x]));
 	return *this;
 }
 
 Terminal&
 Terminal::mvput(lineno_t y,colno_t x,const std::string& text) {
-	mvaddstr(y,x,text.c_str());
+	::move(y,x);
+	put(text);
 	return *this;
 }
 

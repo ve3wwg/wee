@@ -55,7 +55,7 @@ void
 View::draw_status() {
 	std::string text;
 
-	text.append(256,main_view == this ? '=' : '-');
+	text.append(256,char(Terminal::acs_hline));
 	text.replace(5,10," Wee-1.0 (");
 
 	size_t mode_pos = 15;
