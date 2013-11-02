@@ -15,8 +15,9 @@
 class View {
 	viewid_t	id;		// View ID
 	Terminal	*term;		// Terminal associated with this view
-	Cursor		*top;		// Top cursor, if any
+	Cursor		top;		// Top cursor
 	colno_t		offset;		// Column offset, else 0
+	size_t		width;		// Window text width
 
 	static viewid_t			next_id;
 	static std::unordered_map<viewid_t,View*> views_map;

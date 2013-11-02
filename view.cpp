@@ -22,6 +22,7 @@ View::View(Terminal& term) {
 	top = 0;			// No cursor yet
 	views_map[id] = this;
 	offset = 0;
+	width = term.get_cols();	// By default, assume full width of terminal
 }
 
 View::~View() {
@@ -31,39 +32,43 @@ View::~View() {
 
 void
 View::disassociate(regid_t bufid) {
-	return;		// FIX ME FINISH ME
+	if ( bufid != top.get_bufid() )
+		return;		// Does not affect this cursor
+	top.disassociate();	// No longer associated with a buffer
 }
 
 void
 View::associate(const Cursor& bufref) {
-	if ( top )
-		delete top;
-	top = new Cursor(bufref);
+	top = bufref;
 }
 
 void
 View::fetch_line(std::string& text,int tline) {
 	text.clear();
-	if ( !top )
-		return;			// No associated buffer
 
-	Buffer *buf = top->buffer();
-	if ( !buf )
-		return;			// Still no buffer
+	if ( top.get_bufid() ) {
+		Buffer *buf = top.buffer();
+		if ( buf ) {
+			lineno_t lines = buf->length();	// # of lines in buffer
+			lineno_t curline = top.line();
+			if ( curline < lines ) {
+				std::string temp;
+				buf->get_line(temp,curline);
 
-	lineno_t lines = buf->length();	// # of lines in buffer
-	lineno_t curline = top->line();
-	if ( curline >= lines )
-		return;
-
-	std::string temp;
-	buf->get_line(temp,curline);
-
-	if ( !offset || offset >= text.size() ) {
-		text = temp;
-	} else	{
-		text = temp.substr(offset);
+				if ( !offset || offset >= text.size() ) {
+					text = temp;
+				} else	{
+					text = temp.substr(offset);
+				}
+			}
+		}
 	}
+
+	if ( text.size() < width )
+		text.append(' ',width - text.size());
+	if ( text.size() > width )
+		text.resize(width);
+	assert(text.size() == width);
 }
 
 
