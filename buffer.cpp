@@ -106,6 +106,37 @@ Buffer::get_line(std::string& text,lineno_t lno) {
 }
 
 void
+Buffer::get_flat(std::string& text,std::vector<size_t>& pos,lineno_t lno) {
+	std::string raw;
+
+	text.clear();
+	pos.clear();
+
+	get_line(raw,lno);		// Get the raw text
+
+	{
+		std::stringstream s;
+		size_t col = 0;
+
+		for ( size_t cx=0; cx<raw.size(); ++cx ) {
+			char ch = raw[cx];
+			if ( ch != '\t' ) {
+				pos.push_back(col);
+				s << ch;
+				++col;
+			} else	{
+				pos.push_back(col);
+				colno_t ncol = fwd_tab(col);
+				while ( col < ncol )
+					s << ' ';
+				col = ncol;
+			}
+		}
+		text = s.str();
+	}
+}
+
+void
 Buffer::dump() {
 	unsigned lno = 0;
 

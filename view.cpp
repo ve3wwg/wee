@@ -126,7 +126,9 @@ View::fetch_line(std::string& text,int vline) {
 			lineno_t curline = top.line() + vline;
 			if ( curline < lines ) {
 				std::string temp;
-				buf->get_line(temp,curline);
+				std::vector<size_t> pos;
+
+				buf->get_flat(temp,pos,curline);
 
 				if ( !offset || offset >= text.size() ) {
 					text = temp;

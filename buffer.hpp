@@ -9,13 +9,14 @@
 #include "types.hpp"
 #include "registry.hpp"
 #include "pathnames.hpp"
+#include "tabs.hpp"
 
 #include <unordered_map>
 #include <vector>
 
 class Cursor;
 
-class Buffer {
+class Buffer : public Tabs {
 	regid_t		bufid;		// Buffer's ID value 
 	std::string	errmsg;		// Last deposited error message
 	Pathname	pathname;	// Pathname of file loaded
@@ -42,6 +43,7 @@ public:	Buffer();
 	inline const std::string& get_pathname() { return pathname.pathname(); }
 
 	void get_line(std::string& text,lineno_t lno);
+	void get_flat(std::string& text,std::vector<size_t>& pos,lineno_t lno);
 
 	bool read_file(const std::string& pathname);
 
