@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 // buffer.cpp -- Buffer Clases Implementation
 // Date: Sun Oct 27 21:24:03 2013
 ///////////////////////////////////////////////////////////////////////
@@ -127,8 +127,10 @@ Buffer::get_flat(std::string& text,std::vector<size_t>& pos,lineno_t lno) {
 			} else	{
 				pos.push_back(col);
 				colno_t ncol = fwd_tab(col);
-				while ( col < ncol )
+				while ( col < ncol ) {
 					s << ' ';
+					++col;
+				}
 				col = ncol;
 			}
 		}
