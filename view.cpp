@@ -229,7 +229,7 @@ void
 View::refresh() {
 	for ( auto it = views_map.begin(); it != views_map.end(); ++it ) {
 		View *view = it->second;
-		view->refresh();
+		view->draw();
 	}
 
 	View& main = View::focus();
