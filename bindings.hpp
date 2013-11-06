@@ -14,7 +14,7 @@
 #include "term.hpp"
 #include "keystrokes.hpp"
 
-typedef void (*bindproc_t)(int prefix,bool has_prefix);
+typedef bool (*bindproc_t)(int prefix,bool has_prefix);
 
 class Key_Bindings {
 	struct s_keynode {

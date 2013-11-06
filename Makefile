@@ -10,7 +10,7 @@ OPTZ            = -g -O0
 LDFLAGS         = -lncurses
 
 OBJS		= wee.o term.o keystrokes.o strutil.o bindings.o dispatch.o registry.o buffer.o \
-		  pathnames.o view.o cursor.o tabs.o
+		  pathnames.o view.o cursor.o tabs.o xeq.o
 
 .cpp.o:
 	$(CXX) -c $(CXXFLAGS) $< -o $*.o

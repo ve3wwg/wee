@@ -18,6 +18,7 @@
 #include "bindings.hpp"
 #include "buffer.hpp"
 #include "view.hpp"
+#include "xeq.hpp"
 
 Terminal term;
 Key_Bindings main_bindings;
@@ -35,17 +36,6 @@ tty_cleanup() {
 }
 
 //////////////////////////////////////////////////////////////////////
-// Exit the editor
-//////////////////////////////////////////////////////////////////////
-
-static void
-xeq_quit(int prefix,bool have_prefix) {
-	(void) prefix;
-	(void) have_prefix;
-	exit(0);
-}
-
-//////////////////////////////////////////////////////////////////////
 // Initialize the main_bindings
 //////////////////////////////////////////////////////////////////////
 
@@ -53,6 +43,8 @@ static void
 init_bindings() {
 	main_bindings.bind("^X^C",xeq_quit);
 	main_bindings.bind("^XC",xeq_quit);
+	main_bindings.bind("^N",xeq_nline);
+	main_bindings.bind("^P",xeq_pline);
 }
 
 //////////////////////////////////////////////////////////////////////

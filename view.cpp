@@ -108,21 +108,20 @@ View::draw_status() {
 
 void
 View::reposition() {
-	bool redraw = false;
 
 	if ( point.line() < top.line() ) {
 		top.set_line(point.line());
-		redraw = true;
+		dirty = true;
 	}
 
 	lineno_t h = point.line() - top.line();
 
-	if ( h > height ) {
-		redraw = true;
-		if ( height <= 3 ) {
-			top.set_line(point.line()-height+1);
+	if ( h >= height-1 ) {
+		dirty = true;
+		if ( height-1 <= 3 ) {
+			top.set_line(point.line()-(height-1)+1);
 		} else	{
-			top.set_line(point.line()-height+3);
+			top.set_line(point.line()-(height-1-3)+1);
 		}
 	}
 }
@@ -159,8 +158,8 @@ View::draw_point() {
 
 void
 View::draw() {
+	reposition();
 	if ( dirty ) {
-		reposition();
 		for ( size_t vx=0; vx < height; ++vx ) {
 			lineno_t y = topline + vx;
 			std::string text;

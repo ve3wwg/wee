@@ -116,6 +116,40 @@ Cursor::buffer() {
 	return Buffer::lookup(bufid);
 }
 
+bool
+Cursor::nline(int offset) {
+	if ( offset < 0 )
+		pline(-offset);
+
+	Buffer *buf = buffer();
+	lineno_t total_lines = lineno_t(buf->length());
+
+	lineno_t loffset = lineno_t(offset);
+
+	if ( lno + loffset >= total_lines ) {
+		lno = total_lines;
+		return lno + loffset <= total_lines;	// Return true if the last line was target
+	}
+
+	lno += loffset;
+	return true;
+}
+
+bool
+Cursor::pline(int offset) {
+	if ( offset < 0 )
+		nline(-offset);
+
+	lineno_t loffset = lineno_t(offset);
+	if ( loffset >= lno ) {
+		lno = 0;
+		return loffset <= lno;
+	}
+
+	lno -= loffset;
+	return true;
+}
+
 //////////////////////////////////////////////////////////////////////
 // Static methods for Cursors
 //////////////////////////////////////////////////////////////////////

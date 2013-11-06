@@ -47,6 +47,9 @@ public:	Cursor();
 	void reassociate(Buffer *buf);
 	void disassociate();		// Disassociate from buffer
 
+	bool nline(int offset);		// Next line
+	bool pline(int offset);		// Previous line
+
 	// Static methods
 	static Cursor *lookup(csrid_t id);
 	static void destroyed(regid_t bufid);

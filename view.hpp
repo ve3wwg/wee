@@ -45,6 +45,8 @@ public:	View(Terminal& term);
 	void draw_point();			// Position cursor (point)
 	void draw();				// Draw window on terminal
 
+	inline Cursor& get_point() { return point; }
+
 	// Static methods
 
 	static void buffer_destroyed(regid_t bufid);
