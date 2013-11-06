@@ -160,4 +160,40 @@ Cursor::reloaded(regid_t bufid) {
 	}
 }
 
+void
+Cursor::set_line(lineno_t lno) {
+	Buffer *buf = buffer();
+
+	if ( !buf ) {
+		assert(!lno);
+		this->lno = lno;
+		return;
+	}
+
+	size_t total_lines = buf->length();
+
+	if ( size_t(lno) > total_lines )
+		lno = lineno_t(total_lines);
+	this->lno = lno;		
+}
+
+void
+Cursor::set_column(colno_t col) {
+	Buffer *buf = buffer();
+
+	if ( !buf ) {
+		assert(!col);
+		this->col = col;
+		return;
+	}
+
+	std::string text;
+	buf->get_line(text,lno);
+
+	if ( col > colno_t(text.size()) )
+		col = colno_t(text.size());
+
+	this->col = col;
+}
+
 // End cursor.cpp

@@ -97,6 +97,7 @@ public:	Terminal();
 	Terminal& set_bg(Colour c);
 
 	keych_t get();
+	void refresh();
 
 	void flash();
 

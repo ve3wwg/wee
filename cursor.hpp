@@ -41,6 +41,9 @@ public:	Cursor();
 	inline lineno_t line()		{ return lno; }
 	inline colno_t column()		{ return col; }
 
+	void set_line(lineno_t lno);
+	void set_column(colno_t col);
+
 	void reassociate(Buffer *buf);
 	void disassociate();		// Disassociate from buffer
 

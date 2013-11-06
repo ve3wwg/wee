@@ -31,6 +31,7 @@ View::View(Terminal& term) {
 	topline = 0;			// Assume top terminal line
 	left = 0;			// Assume leftmost terminal column
 	statline = height - 1;		// Location of status line
+	dirty = true;
 }
 
 View::~View() {
@@ -43,11 +44,15 @@ View::disassociate(regid_t bufid) {
 	if ( bufid != top.get_bufid() )
 		return;		// Does not affect this cursor
 	top.disassociate();	// No longer associated with a buffer
+	point.disassociate();
+	dirty = true;
 }
 
 void
 View::associate(const Cursor& bufref) {
 	top = bufref;
+	point = top;
+	dirty = true;
 }
 
 void
@@ -102,17 +107,71 @@ View::draw_status() {
 }
 
 void
-View::draw() {
+View::reposition() {
+	bool redraw = false;
 
-	for ( size_t vx=0; vx < height; ++vx ) {
-		lineno_t y = topline + vx;
-		std::string text;
-
-		fetch_line(text,vx);
-		term->mvput(y,left,text);
+	if ( point.line() < top.line() ) {
+		top.set_line(point.line());
+		redraw = true;
 	}
 
-	draw_status();
+	lineno_t h = point.line() - top.line();
+
+	if ( h > height ) {
+		redraw = true;
+		if ( height <= 3 ) {
+			top.set_line(point.line()-height+1);
+		} else	{
+			top.set_line(point.line()-height+3);
+		}
+	}
+}
+
+void
+View::draw_point() {
+	assert(point.line() >= top.line());
+	assert(point.line() - top.line() < height);
+
+	lineno_t y = point.line() - top.line();
+	colno_t x = point.column();
+
+	std::string temp;
+	std::vector<size_t> pos;
+
+	Buffer *buf = top.buffer();
+	buf->get_flat(temp,pos,point.line());
+
+	if ( pos.size() <= 0 )
+		x = 0;
+	else if ( size_t(x) >= pos.size() )
+		x = pos[pos.size() - 1];
+
+	if ( x <= offset )
+		x = 0;
+	else	x -= offset;
+
+	y += topline;
+	x += left;
+
+	term->move(y,x);
+	term->refresh();
+}
+
+void
+View::draw() {
+	if ( dirty ) {
+		reposition();
+		for ( size_t vx=0; vx < height; ++vx ) {
+			lineno_t y = topline + vx;
+			std::string text;
+
+			fetch_line(text,vx);
+			term->mvput(y,left,text);
+		}
+		draw_point();
+		draw_status();
+		dirty = false;
+	}
 }
 
 void
@@ -164,6 +223,17 @@ View::buffer_destroyed(regid_t bufid) {
 View&
 View::focus() {
 	return *main_view;
+}
+
+void
+View::refresh() {
+	for ( auto it = views_map.begin(); it != views_map.end(); ++it ) {
+		View *view = it->second;
+		view->refresh();
+	}
+
+	View& main = View::focus();
+	main.draw_point();
 }
 
 // End view.cpp

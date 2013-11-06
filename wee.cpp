@@ -94,9 +94,8 @@ main(int argc,char **argv) {
 		delete csr;
 	}
 
-	main.draw();
-
 	for (;;) {
+		View::refresh();
 		keystroke = term.get();
 		if ( (action = disp.dispatch(keystroke,proc,main_bindings)) == Dispatch::Exec && proc != 0 ) {
 			term.mvclear_botline();

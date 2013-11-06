@@ -44,7 +44,13 @@ Terminal::clear() {
 
 keych_t
 Terminal::get() {
+	::refresh();
 	return ::getch();
+}
+
+void
+Terminal::refresh() {
+	::refresh();
 }
 
 void
