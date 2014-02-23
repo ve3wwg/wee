@@ -44,7 +44,10 @@ init_bindings() {
 	main_bindings.bind("^X^C",xeq_quit);
 	main_bindings.bind("^XC",xeq_quit);
 	main_bindings.bind("^N",xeq_nline);
+	main_bindings.bind("^(DOWN)",xeq_nline);
 	main_bindings.bind("^P",xeq_pline);
+	main_bindings.bind("^Z",xeq_pline);
+	main_bindings.bind("^(UP)",xeq_pline);
 }
 
 //////////////////////////////////////////////////////////////////////
