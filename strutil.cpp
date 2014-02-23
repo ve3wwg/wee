@@ -9,7 +9,10 @@
 #include <errno.h>
 #include <string.h>
 #include <assert.h>
+
+extern "C" {
 #include <ctype.h>
+}
 
 #include "strutil.hpp"
 

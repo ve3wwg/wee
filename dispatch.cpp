@@ -10,6 +10,10 @@
 #include <string.h>
 #include <assert.h>
 
+extern "C" {
+#include <ctype.h>
+}
+
 #include <sstream>
 
 #include "dispatch.hpp"
